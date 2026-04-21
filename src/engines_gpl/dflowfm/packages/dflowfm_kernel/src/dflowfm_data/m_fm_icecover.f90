@@ -198,7 +198,7 @@ contains
 
       integer :: istat !< status flag for allocation
 
-      if (.not. is_allocated_icecover(ice_data)) then
+      if (is_allocated_icecover(ice_data) == 0) then
          istat = alloc_icecover(ice_data, 1, ndx)
          call fm_ice_update_spatial_pointers()
       end if

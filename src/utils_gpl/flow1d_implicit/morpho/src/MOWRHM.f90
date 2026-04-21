@@ -235,14 +235,14 @@ subroutine mowrhm( nmoman, nmomap, nmotim, ngrid , nbran , itim  ,&
 
          if ( morini(ifil) .gt. 0 ) then
 !           File exists already hence open again:
-            open ( unit = lun, file = mrpmap, form = 'binary',&
+            open ( unit = lun, file = mrpmap, form = 'unformatted',&
             &access = 'APPEND' )
          end if
 
 
          if ( morini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = mrpmap , form = 'binary')
+            open(lun , file = mrpmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = mrpmap , form = 'unformatted')
@@ -402,13 +402,13 @@ subroutine mowrhm( nmoman, nmomap, nmotim, ngrid , nbran , itim  ,&
 
          if ( morini(ifil) .gt. 0 ) then
 !           File exists already hence open again:
-            open ( unit = lun, file = mrphis, form = 'binary',&
+            open ( unit = lun, file = mrphis, form = 'unformatted',&
             &access = 'APPEND' )
          end if
 
          if ( morini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = mrphis , form = 'binary')
+            open(lun , file = mrphis , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = mrphis , form = 'unformatted')

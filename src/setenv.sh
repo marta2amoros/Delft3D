@@ -34,16 +34,26 @@ if [[ "$1" == intel24* ]]; then
 elif [ "$1" == "gnu" ]; then
      echo "Loading GNU compiled modules"
 
-     module load cmake/3.30.0_intel2024.0.0
-     module load gcc/12.2.0_gcc12.2.0
-     module load openmpi/4.1.5_gcc12.2.0
-     module load netcdf/4.9.2_4.6.1_gcc12.2.0
-     module load gdal/3.6.3_gcc12.2.0
-     module load proj/9.2.0_gcc12.2.0
-     module load tiff/4.5.0rc3_gcc12.2.0
-     module load patchelf/0.17.2_gcc12.2.0
-     module load ninja/1.11.1_gcc12.2.0_standalone
-     module load petsc/3.19.0_gcc12.2.0
+     # module load cmake/3.30.0_intel2024.0.0
+     # module load gcc/12.2.0_gcc12.2.0
+     # module load openmpi/4.1.5_gcc12.2.0
+     # module load netcdf/4.9.2_4.6.1_gcc12.2.0
+     # module load gdal/3.6.3_gcc12.2.0
+     # module load proj/9.2.0_gcc12.2.0
+     # module load tiff/4.5.0rc3_gcc12.2.0
+     # module load patchelf/0.17.2_gcc12.2.0
+     # module load ninja/1.11.1_gcc12.2.0_standalone
+     # module load petsc/3.19.0_gcc12.2.0
+     module load cmake/3.30.5
+     module load gcc/13.3.0
+     module load openmpi/4.1.7
+     module load parallel-netcdf/1.12.3
+     module load gdal/3.10.0
+     module load proj/9.4.1
+     module load libtiff/4.7.0
+     module load patchelf/0.17.2
+     module load ninja/1.12.1
+     module load petsc/3.22.1
 
 else
      echo "Loading Intel23 compiled modules"

@@ -169,7 +169,7 @@ subroutine KAFPAH(nfpamn ,nkfpmp ,nkfptm ,ngrid  ,&
             lun  = 66
             if ( kalini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-               open(lun , file = fipmap , form = 'binary')
+               open(lun , file = fipmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
                open(lun , file = fipmap , form = 'unformatted')
@@ -246,7 +246,7 @@ subroutine KAFPAH(nfpamn ,nkfpmp ,nkfptm ,ngrid  ,&
             lun  = 67
             if ( kalini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-               open(lun , file = fiphis , form = 'binary')
+               open(lun , file = fiphis , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
                open(lun , file = fiphis , form = 'unformatted')

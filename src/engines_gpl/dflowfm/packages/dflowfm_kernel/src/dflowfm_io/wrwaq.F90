@@ -55,7 +55,7 @@ contains
       !                    Although it is not standard Fortran
       !
 #ifdef HAVE_FC_FORM_BINARY
-      open (newunit=lun, file=filename, form='binary', status='replace')
+      open (newunit=lun, file=filename, form='unformatted', status='replace')
 #else
       ! standardized way if binary is not available
       open (newunit=lun, file=filename, form='unformatted', access='stream', status='replace')

@@ -159,7 +159,7 @@ subroutine KAPHYH(nphymn ,nkphmp ,nkphtm ,ngrid  ,&
          lun  = 60
          if ( kalini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = prhmap , form = 'binary')
+            open(lun , file = prhmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = prhmap , form = 'unformatted')
@@ -231,7 +231,7 @@ subroutine KAPHYH(nphymn ,nkphmp ,nkphtm ,ngrid  ,&
          lun  = 61
          if ( kalini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = prhhis , form = 'binary')
+            open(lun , file = prhhis , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = prhhis , form = 'unformatted')

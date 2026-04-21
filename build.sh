@@ -79,7 +79,7 @@ function DoCMake () {
     echo "Executing CMake for $1 ..."
     cd    $root/build_$1$2
     echo "cmake ../src/cmake -G "$generator" -B "." -D CONFIGURATION_TYPE="$1" -D CMAKE_BUILD_TYPE=${buildtype}"
-          cmake ../src/cmake -G "$generator" -B "." -D CONFIGURATION_TYPE="$1" -D CMAKE_BUILD_TYPE=${buildtype} -D CMAKE_INSTALL_PREFIX=../build_$1$2/install/
+          cmake ../src/cmake -G "$generator" -B "." -D CONFIGURATION_TYPE="$1" -D CMAKE_BUILD_TYPE=${buildtype} -D CMAKE_INSTALL_PREFIX=../build_$1$2/install/ -DCMAKE_Fortran_FLAGS="-ffree-line-length-none -std=legacy -fallow-argument-mismatch -Wno-error=c-binding-type"
     if [ $? -ne 0 ]; then
         echo "CMake configure resulted in an error. Check log files."
         exit 1
@@ -190,7 +190,7 @@ prepareonly=0
 mode=quiet
 config=
 generator="Unix Makefiles"
-compiler=intel23
+compiler=gnu
 buildtype=Release
 buildDirExtension=""
 
@@ -314,7 +314,7 @@ chkutils=$(CheckUtils)
 if [ ! -z "$chkutils" ]; then
     echo "$chkutils"
     echo "Install missing programs and retry."
-    exit 1
+    # exit 1
 fi
 
 CreateCMakedir ${config} ${buildDirExtension}

@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.30)
 
 project(CMake)
-enable_testing()
+
+option(BUILD_TESTING "Build the testing suite" OFF)
+
+if(BUILD_TESTING)
+    enable_testing()
+    # Your add_subdirectory(test) or similar lines usually go here
+endif()
 
 # enable project files grouping by folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

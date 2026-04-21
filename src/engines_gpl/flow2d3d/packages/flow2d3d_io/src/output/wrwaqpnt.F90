@@ -95,7 +95,7 @@
 !            write the 'total' lgrid table (currently a full matrix)
 
 #ifdef HAVE_FC_FORM_BINARY
-      open  ( newunit = lunout , file=trim(filnam)//'lgt', form='binary' )
+      open  ( newunit = lunout , file=trim(filnam)//'lgt', form='unformatted' )
 #else
       open  ( newunit = lunout , file=trim(filnam)//'lgt', form = 'unformatted', access='stream')
 #endif
@@ -112,7 +112,7 @@
 !            write the lgrid tabel with zero's and bounds
 
 #ifdef HAVE_FC_FORM_BINARY
-      open  ( newunit = lunout , file=trim(filnam)//'lgo', form='binary' )
+      open  ( newunit = lunout , file=trim(filnam)//'lgo', form='unformatted' )
 #else
       open  ( newunit = lunout , file=trim(filnam)//'lgo', form = 'unformatted', access='stream')
 #endif
@@ -149,7 +149,7 @@
 
 !            make the 'from' 'to' pointer table and the aggregation table
 #ifdef HAVE_FC_FORM_BINARY
-      open  ( newunit = lunout , file=trim(filnam)//'poi', form='binary' )
+      open  ( newunit = lunout , file=trim(filnam)//'poi', form='unformatted' )
 #else
       open  ( newunit = lunout , file=trim(filnam)//'poi', form = 'unformatted', access='stream')
 #endif
@@ -286,7 +286,7 @@
 
 !            write the aggregated lgrid tabel with zero's and bounds
 #ifdef HAVE_FC_FORM_BINARY
-      open  ( newunit = lunout , file=trim(filnam)//'lga', form='binary' )
+      open  ( newunit = lunout , file=trim(filnam)//'lga', form='unformatted' )
 #else
       open  ( newunit = lunout , file=trim(filnam)//'lga', form = 'unformatted', access='stream')
 #endif

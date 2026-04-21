@@ -28,8 +28,6 @@
 !-------------------------------------------------------------------------------
 
 submodule(m_dambreak_breach) m_dambreak_breach_submodule
-   use precision, only: dp
-   use m_meteo, only: ec_undef_int
 
    implicit none
 
@@ -40,59 +38,7 @@ submodule(m_dambreak_breach) m_dambreak_breach_submodule
    integer, dimension(:), allocatable :: first_link !< first dambreak link for each signal
    integer, dimension(:), allocatable :: last_link !< last dambreak link for each signal
 
-   type :: t_dambreak !< data for a single dambreak
-      integer :: algorithm = 0 !< algorithm for the dambreak breach growth
-      integer :: breach_start_link = -1 !< index of the starting link in the breach growth
-      integer :: index_structure = 0 !< index of the structure
-      integer :: ec_item = ec_undef_int !< item for EC module to get crest level and width from a tim file
-      integer :: number_of_links = 0 !< number of links in the dambreak
-      integer :: link_map_offset = 0 !< offset of the local array in the global link array
-      integer, dimension(:), allocatable :: link_indices !< link indices of the dambreak
-      integer, dimension(:), allocatable :: active_links !< active links of the dambreak
-      integer, dimension(:), allocatable :: upstream_link_ids !< upstream link indices
-      integer, dimension(:), allocatable :: downstream_link_ids !< downstream link indices
-      character(len=128) :: name = "" !< name of the dambreak
-      real(kind=dp) :: breach_depth = 0.0_dp !< depth of the breach
-      real(kind=dp) :: breach_width = 0.0_dp !< width of the breach
-      real(kind=dp) :: breach_width_ini = 0.0_dp !< initial width of the breach
-      real(kind=dp) :: breach_width_derivative !< derivative of the breach width
-      real(kind=dp) :: crest_level !< crest level of the breach
-      real(kind=dp) :: crest_level_ini !< initial crest level of the breach
-      real(kind=dp) :: crest_level_min !< minimum crest level of the breach
-      real(kind=dp) :: upstream_level !< upstream water level
-      real(kind=dp) :: downstream_level !< downstream water level
-      real(kind=dp), dimension(2) :: crest_level_and_width !< array to communicate with EC module
-      real(kind=dp) :: width = 0.0_dp !< width of the breach
-      real(kind=dp) :: maximum_width = 0.0_dp !< maximum width of the breach
-      real(kind=dp) :: maximum_allowed_width = -1.0_dp !< maximum allowed width of the breach
-      real(kind=dp) :: water_level_jump !< water level jump of the breach
-      real(kind=dp) :: normal_velocity !< normal velocity of the breach
-      real(kind=dp) :: u_crit !< critical velocity for the breach growth
-      real(kind=dp) :: t0 = 0.0_dp !< time of the start of the dambreak
-      real(kind=dp) :: time_to_breach_to_maximum_depth !< time to breach to maximum depth
-      real(kind=dp) :: a_coeff !< coefficient a for the breach growth
-      real(kind=dp) :: b_coeff !< coefficient b for the breach growth
-      real(kind=dp) :: f1 !< coefficient f1 for the breach width derivative
-      real(kind=dp) :: f2 !< coefficient f2 for the breach width derivative
-      real(kind=dp), dimension(:), allocatable :: link_actual_width !< actual width of the links in the dambreak
-      real(kind=dp), dimension(:), allocatable :: link_effective_width !< effective width of the links in the dambreak
-      procedure(calculate_breach_growth_using_any_model), pointer :: calculate_breach_growth => null()
-   contains
-      procedure :: array_allocation => allocate_arrays
-      final :: deallocate_arrays
-   end type
-
    type(t_dambreak), target, dimension(:), allocatable :: dambreaks(:) !< dambreak data for all dambreaks
-
-   abstract interface
-      subroutine calculate_breach_growth_using_any_model(dambreak, time, time_step)
-         use precision, only: dp
-         import t_dambreak
-         class(t_dambreak), intent(inout) :: dambreak !< dambreak data for a single dambreak
-         real(kind=dp), intent(in) :: time !< current time
-         real(kind=dp), intent(in) :: time_step !< time step
-      end subroutine calculate_breach_growth_using_any_model
-   end interface
 
    integer :: number_of_mappings !< number of mappings for upstream and downstream water levels
    type :: t_mapping !< mapping of water level
@@ -306,7 +252,6 @@ contains
 
    !> Calculate breach growth using vdKnaap model
    subroutine calculate_breach_growth_using_vdKnaap_model(dambreak, time, time_step)
-      import t_dambreak
 
       class(t_dambreak), intent(inout) :: dambreak !< dambreak data for a single dambreak
       real(kind=dp), intent(in) :: time !< current time
@@ -351,8 +296,6 @@ contains
    subroutine calculate_breach_growth_using_Verheij_vdKnaap_model(dambreak, time, time_step)
       use ieee_arithmetic, only: ieee_is_nan
       use m_physcoef, only: gravity => ag
-      import t_dambreak
-
       class(t_dambreak), intent(inout) :: dambreak !< dambreak data for a single dambreak
       real(kind=dp), intent(in) :: time !< current time
       real(kind=dp), intent(in) :: time_step !< time step
@@ -417,8 +360,7 @@ contains
       use m_meteo, only: ec_gettimespacevalue_by_itemID, ecInstancePtr
       use m_flowtimes, only: irefdate, tunit, tzone
       use messagehandling, only: msgbuf, LEVEL_ERROR, SetMessage
-      import t_dambreak
-
+      
       class(t_dambreak), intent(inout) :: dambreak !< dambreak data for a single dambreak
       real(kind=dp), intent(in) :: time !< current time
       real(kind=dp), intent(in) :: time_step !< time step

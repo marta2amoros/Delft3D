@@ -127,7 +127,7 @@
       enddo
 !
 #ifdef HAVE_FC_FORM_BINARY
-      open  ( newunit = lunout , file=trim(filnam)//'srfold', form='binary' )
+      open  ( newunit = lunout , file=trim(filnam)//'srfold', form='unformatted' )
 #else
       open  ( newunit = lunout , file=trim(filnam)//'srfold', form = 'unformatted', access='stream')
 #endif
@@ -136,7 +136,7 @@
       close ( lunout )
       
 #ifdef HAVE_FC_FORM_BINARY
-      open  ( newunit = lunout , file=trim(filnam)//'srf', form='binary' )
+      open  ( newunit = lunout , file=trim(filnam)//'srf', form='unformatted' )
 #else
       open  ( newunit = lunout , file=trim(filnam)//'srf', form = 'unformatted', access='stream')
 #endif
@@ -147,7 +147,7 @@
 ! write depth at cell centra (depth at zeta point (dps))
 !      
 #ifdef HAVE_FC_FORM_BINARY
-      open  ( newunit = lunout , file=trim(filnam)//'dps', form='binary' )
+      open  ( newunit = lunout , file=trim(filnam)//'dps', form='unformatted' )
 #else
       open  ( newunit = lunout , file=trim(filnam)//'dps', form = 'unformatted', access='stream')
 #endif
@@ -170,7 +170,7 @@
             dd(k) = dd(k) / surf(k)
          enddo
 #ifdef HAVE_FC_FORM_BINARY
-      open  ( newunit = lunout , file=trim(filnam)//'chz', form='binary' )
+      open  ( newunit = lunout , file=trim(filnam)//'chz', form='unformatted' )
 #else
       open  ( newunit = lunout , file=trim(filnam)//'chz', form = 'unformatted', access='stream')
 #endif
@@ -189,7 +189,7 @@
          enddo
       enddo
 #ifdef HAVE_FC_FORM_BINARY
-      open  ( newunit = lunout , file=trim(filnam)//'wdt', form='binary' )
+      open  ( newunit = lunout , file=trim(filnam)//'wdt', form='unformatted' )
 #else
       open  ( newunit = lunout , file=trim(filnam)//'wdt', form = 'unformatted', access='stream')
 #endif
@@ -201,7 +201,7 @@
 
 !           Open file
 #ifdef HAVE_FC_FORM_BINARY
-      open  ( newunit = lunout , file=trim(filnam)//'len', form='binary' )
+      open  ( newunit = lunout , file=trim(filnam)//'len', form='unformatted' )
 #else
       open  ( newunit = lunout , file=trim(filnam)//'len', form = 'unformatted', access='stream')
 #endif

@@ -153,7 +153,7 @@ subroutine MOTRIN (filnam)
 
 !
 #if defined (USE_MSWINDOWS)
-      open ( lutr, file=traout, form='binary')
+      open ( lutr, file=traout, form='unformatted')
 #else
 #if defined (USE_HPUX)
       open ( lutr, file=traout, form='unformatted')
@@ -175,7 +175,7 @@ subroutine MOTRIN (filnam)
          griout = crefil
       endif
 #if defined (USE_MSWINDOWS)
-      open ( lutr, file=griout, form='binary')
+      open ( lutr, file=griout, form='unformatted')
 #else
 #if defined (USE_HPUX)
       open ( lutr, file=griout, form='unformatted')

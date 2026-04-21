@@ -129,7 +129,7 @@ subroutine gsfrrhi (nfrcmap ,nfrctim ,ngrid  ,nunlay ,nfrac   ,&
          lun  = 114
          if ( sedini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = gfrcmap , form = 'binary')
+            open(lun , file = gfrcmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = gfrcmap , form = 'unformatted')
@@ -230,7 +230,7 @@ subroutine gsfrrhi (nfrcmap ,nfrctim ,ngrid  ,nunlay ,nfrac   ,&
          lun  = 115
          if ( sedini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = gfrchis , form = 'binary')
+            open(lun , file = gfrchis , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = gfrchis , form = 'unformatted')

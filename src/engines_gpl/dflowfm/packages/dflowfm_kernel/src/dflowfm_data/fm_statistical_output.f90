@@ -2244,11 +2244,20 @@ contains
       real(dp), pointer, dimension(:) :: temp_pointer
 
       procedure(process_data_interface_double), pointer :: function_pointer => null()
+      ! Declare these as procedures that can be pointed to
+      procedure(aggregate_obscrs_data), pointer :: p_agg
+      procedure(transform_qplat), pointer       :: p_trans
+      procedure(calculate_dredge_time_fraction), pointer :: p_dredge
 
       integer :: i, ntot, num_const_items, nlyrs, variable_index, start_index, num_layers
       integer, allocatable, dimension(:) :: idx_his_hwq
       integer, allocatable, dimension(:) :: idx_constituents_crs, idx_tracers_stations
       integer, allocatable, dimension(:) :: idx_wqbot_stations, idx_wqbot3D_stations
+
+      ! Assign the pointers to the actual subroutines
+      p_agg => aggregate_obscrs_data
+      p_trans => transform_qplat
+      p_dredge => calculate_dredge_time_fraction
 
       ntot = numobs + nummovobs
       !
@@ -2877,7 +2886,7 @@ contains
          !
          ! Basic flow quantities
          !
-         call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_OBSCRS_DISCHARGE), obscrs_data(:, 1), aggregate_obscrs_data)
+         call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_OBSCRS_DISCHARGE), obscrs_data(:, 1), p_agg)
          call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_OBSCRS_DISCHARGE_CUMUL), obscrs_data(:, 2))
          call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_OBSCRS_AREA), obscrs_data(:, 3))
          call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_OBSCRS_VELOCITY), obscrs_data(:, 4))
@@ -2896,7 +2905,7 @@ contains
       !
       if (jahislateral > 0 .and. numlatsg > 0) then
          allocate (qplat_data(size(qplat, dim=2)))
-         call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_LATERAL_PRESCRIBED_DISCHARGE_INSTANTANEOUS), qplat_data, transform_qplat)
+         call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_LATERAL_PRESCRIBED_DISCHARGE_INSTANTANEOUS), qplat_data, p_trans)
          call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_LATERAL_PRESCRIBED_DISCHARGE_AVERAGE), qplatAve)
          call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_LATERAL_REALIZED_DISCHARGE_INSTANTANEOUS), qLatReal)
          call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_LATERAL_REALIZED_DISCHARGE_AVERAGE), qLatRealAve)
@@ -2906,7 +2915,7 @@ contains
          call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_DRED_LINK_DISCHARGE), temp_pointer)
          call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_DRED_DISCHARGE), dadpar%totvoldred)
          call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_DUMP_DISCHARGE), dadpar%totvoldump)
-         call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_DRED_TIME_FRAC), null(), calculate_dredge_time_fraction)
+         call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_DRED_TIME_FRAC), null(), p_dredge)
          call add_stat_output_items(output_set, output_config_set%configs(IDX_HIS_PLOUGH_TIME_FRAC), time_ploughed)
       end if
 

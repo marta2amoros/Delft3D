@@ -166,7 +166,7 @@ subroutine KAFREH(nfremn ,nkfrmp ,nkfrtm ,nsamp  ,&
             lun  = 68
             if ( kalini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-               open(lun , file = firmap , form = 'binary')
+               open(lun , file = firmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
                open(lun , file = firmap , form = 'unformatted')
@@ -240,7 +240,7 @@ subroutine KAFREH(nfremn ,nkfrmp ,nkfrtm ,nsamp  ,&
             lun  = 69
             if ( kalini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-               open(lun , file = firhis , form = 'binary')
+               open(lun , file = firhis , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
                open(lun , file = firhis , form = 'unformatted')

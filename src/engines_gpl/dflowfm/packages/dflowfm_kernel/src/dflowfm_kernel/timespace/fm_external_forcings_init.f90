@@ -28,7 +28,6 @@
 !-------------------------------------------------------------------------------
 !
 submodule(fm_external_forcings) fm_external_forcings_init
-   use precision_basics, only: dp
    implicit none
 
    integer, parameter :: INI_VALUE_LEN = 256
@@ -418,7 +417,9 @@ contains
       has_location_file = has_key(node_ptr, 'Lateral', 'locationFile')
 
       ! Test if multiple discharge methods were set
-      number_of_discharge_specifications = sum([(1, integer :: i=1, maximum_number_of_discharge_specifications)], [has_node_id, has_branch_id .or. has_chainage, has_num_coordinates .or. has_x_coordinates .or. has_y_coordinates, has_location_file])
+      number_of_discharge_specifications = count([has_node_id, has_branch_id .or. has_chainage, &
+                                                  has_num_coordinates .or. has_x_coordinates .or. has_y_coordinates, &
+                                                  has_location_file])
 
       if (number_of_discharge_specifications < 1) then
          call mess(LEVEL_ERROR, 'Lateral '''//trim(loc_id)//''': No discharge specifications found. Use nodeId, branchId + chainage, numCoordinates + xCoordinates + yCoordinates, or locationFile.')

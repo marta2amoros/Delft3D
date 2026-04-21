@@ -58,7 +58,8 @@ module unstruc_caching
 
    logical, private :: cache_success
 
-   character(len=20), dimension(5), private :: section = ['OBSERVATIONS        ', &
+   character(len=20), dimension(5), private :: section = [character(len=20) :: &
+                                                          'OBSERVATIONS        ', &
                                                           'FIXED WEIRS         ', &
                                                           'CROSS_SECTIONS      ', &
                                                           'DRY_POINTS_AND_AREAS', &

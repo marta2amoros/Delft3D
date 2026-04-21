@@ -119,12 +119,15 @@ contains
    end function get_operation_type
 
    !> Test if any output is requested in the value string
-   function is_output_requested_in_value_string(value_string) result(res)
+   function is_output_requested_in_value_string(value_string_in) result(res)
       use m_statistical_output_types, only: SO_UNKNOWN, SO_NONE
-      character(*), value :: value_string !< The string provided as a value in the MDU file
+      character(len=*), intent(in) :: value_string_in
       logical :: res
-
+      character(len=len(value_string_in)) :: value_string
       integer :: ierr, operation_type, moving_average_window
+
+      value_string = value_string_in
+
       res = .false.
       do
          ierr = parse_next_stat_type_from_value_string(value_string, operation_type, moving_average_window)

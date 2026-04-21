@@ -645,20 +645,36 @@ end function ionc_put_var_chars_dll
 
 ! TODO ******* DERIVED TYPE GIVEN BY C/C++/C#-PROGRAM
 !> Add the global attributes to a NetCDF file
-function ionc_add_global_attributes_dll(ioncid, meta) result(ierr)  bind(C, name="ionc_add_global_attributes")
+! function ionc_add_global_attributes_dll(ioncid, meta) result(ierr)  bind(C, name="ionc_add_global_attributes")
+! !DEC$ ATTRIBUTES DLLEXPORT :: ionc_add_global_attributes_dll
+!   integer(kind=c_int),    intent(in)    :: ioncid      !< The IONC data set id.
+!   type (t_ug_meta),       intent(in)    :: meta
+!   integer(kind=c_int)                   :: ierr        !< Result status, ionc_noerr if successful.!
+!   character(len=ug_strLenMeta)          :: institution, source, references, version, modelname !< variables to be passed to io_netcdf for construction of the metadata structure!
+!
+!   institution = meta%institution
+!   source      = meta%source
+!   references  = meta%references
+!   version     = meta%version
+!   modelname   = meta%modelname
+!
+!   ierr = ionc_add_global_attributes(ioncid, institution,source,references,version,modelname)
+!
+!end function ionc_add_global_attributes_dll
+
+function ionc_add_global_attributes_dll(ioncid, c_meta_ptr) result(ierr) bind(C, name="ionc_add_global_attributes")
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_add_global_attributes_dll
-   integer(kind=c_int),    intent(in)    :: ioncid      !< The IONC data set id.
-   type (t_ug_meta),       intent(in)    :: meta
-   integer(kind=c_int)                   :: ierr        !< Result status, ionc_noerr if successful.!
-   character(len=ug_strLenMeta)          :: institution, source, references, version, modelname !< variables to be passed to io_netcdf for construction of the metadata structure
+   integer(kind=c_int), intent(in) :: ioncid
+   type(c_ptr),         value      :: c_meta_ptr  !< Receive as a C pointer
+   integer(kind=c_int)             :: ierr
 
-   institution = meta%institution
-   source      = meta%source
-   references  = meta%references
-   version     = meta%version
-   modelname   = meta%modelname
+   type(t_ug_meta), pointer :: meta
 
-   ierr = ionc_add_global_attributes(ioncid, institution,source,references,version,modelname)
+   ! "Cast" the C pointer back into a Fortran pointer we can use
+   call c_f_pointer(c_meta_ptr, meta)
+
+   ! Now call the internal Fortran routine using the dereferenced pointer
+   ierr = ionc_add_global_attributes(ioncid, meta)
 
 end function ionc_add_global_attributes_dll
 
@@ -1234,97 +1250,54 @@ function ionc_get_1d_mesh_discretisation_points_count_dll(ioncid, meshid, nmeshp
 end function ionc_get_1d_mesh_discretisation_points_count_dll
 
 
-function ionc_get_1d_mesh_discretisation_points_dll(ioncid, meshid, c_branchidx, c_offset, nodesinfo, nmeshpoints, startIndex) result(ierr) bind(C, name="ionc_get_1d_mesh_discretisation_points")
+function ionc_get_1d_mesh_discretisation_points_dll(ioncid, meshid, c_branchidx, c_offset, c_nodesinfo_ptr, nmeshpoints, startIndex) result(ierr) bind(C, name="ionc_get_1d_mesh_discretisation_points")
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_get_1d_mesh_discretisation_points_dll
-  integer(kind=c_int), intent(in)   :: ioncid, meshid, nmeshpoints,startIndex
-  type(c_ptr), intent(inout)        :: c_branchidx, c_offset
-  type(t_ug_charinfo),  intent(inout)  :: nodesinfo(nmeshpoints)
-  character(len=ug_idsLen)          :: nodeids(nmeshpoints)
-  character(len=ug_idsLongNamesLen) :: nodelongnames(nmeshpoints)
-  double precision,pointer          :: offset(:)
-  integer,pointer                   :: branchidx(:)
-  character(len=8)                  :: varnameids
-  character(len=15)                 :: varnamelongnames
-  integer                           :: ierr,i
+   integer(kind=c_int), intent(in) :: ioncid
+   integer(kind=c_int), intent(in) :: meshid
+   type(c_ptr),         value      :: c_branchidx
+   type(c_ptr),         value      :: c_offset
+   type(c_ptr),         value      :: c_nodesinfo_ptr  !< Change this to a C pointer
+   integer(kind=c_int), intent(in) :: nmeshpoints
+   integer(kind=c_int), intent(in) :: startIndex
+   integer(kind=c_int)             :: ierr
 
-  call c_f_pointer(c_branchidx, branchidx, (/ nmeshpoints /))
-  call c_f_pointer(c_offset, offset, (/ nmeshpoints /))
+   ! Internal Fortran pointers
+   integer,          pointer :: branchidx(:), offset(:)
+   type(t_ug_charinfo), pointer :: nodesinfo(:) !< This is our Fortran view of the data
 
-  ierr = ionc_get_1d_mesh_discretisation_points_ugrid(ioncid, meshid, branchidx, offset, startIndex)
+   ! Map the C pointers to Fortran arrays/objects
+   call c_f_pointer(c_branchidx, branchidx, [nmeshpoints])
+   call c_f_pointer(c_offset,    offset,    [nmeshpoints])
+   call c_f_pointer(c_nodesinfo_ptr, nodesinfo, [nmeshpoints])
 
-  !The names of the variables are hard-coded
-  varnameids        = 'node_id'
-  ierr              = ionc_get_var_chars(ioncid, meshid, varnameids, nodeids)
-  if (ierr /= IONC_NOERR) then
-     ! Backwards compatible read of Deltares-0.9 plural-names.
-     varnameids     = 'node_ids'
-     ierr           = ionc_get_var_chars(ioncid, meshid, varnameids, nodeids)
-  end if
-  varnamelongnames  = 'node_long_name'
-  ierr              = ionc_get_var_chars(ioncid, meshid, varnamelongnames, nodelongnames)
-  if (ierr /= IONC_NOERR) then
-     ! Backwards compatible read of Deltares-0.9 plural-names.
-     varnamelongnames  = 'node_long_names'
-     ierr              = ionc_get_var_chars(ioncid, meshid, varnamelongnames, nodelongnames)
-  end if
-
-  do i=1,nmeshpoints
-     nodesinfo(i)%id       = nodeids(i)
-     nodesinfo(i)%longname = nodelongnames(i)
-  end do
+   ! Call the internal logic
+   ierr = ionc_get_1d_mesh_discretisation_points(ioncid, meshid, branchidx, offset, nodesinfo, startIndex)
 
 end function ionc_get_1d_mesh_discretisation_points_dll
 
-function ionc_get_1d_mesh_discretisation_points_v1_dll(ioncid, meshid, c_branchidx, c_offset, nodesinfo, nmeshpoints, startIndex, c_coordx, c_coordy) result(ierr) bind(C, name="ionc_get_1d_mesh_discretisation_points_v1")
+function ionc_get_1d_mesh_discretisation_points_v1_dll(ioncid, meshid, c_branchidx, c_offset, c_nodesinfo_ptr, nmeshpoints, startIndex, c_coordx, c_coordy) result(ierr) bind(C, name="ionc_get_1d_mesh_discretisation_points_v1")
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_get_1d_mesh_discretisation_points_v1_dll
-  integer(kind=c_int), intent(in)   :: ioncid, meshid, nmeshpoints,startIndex
-  type(c_ptr), intent(inout)        :: c_branchidx, c_offset, c_coordx, c_coordy
-  type(t_ug_charinfo),  intent(inout)  :: nodesinfo(nmeshpoints)
-  character(len=ug_idsLen)          :: nodeids(nmeshpoints)
-  character(len=ug_idsLongNamesLen) :: nodelongnames(nmeshpoints)
-  double precision,pointer          :: offset(:)
-  integer,pointer                   :: branchidx(:)
-  double precision,pointer          :: coordx(:), coordy(:)
-  integer,parameter                 :: size_of_varname = 2
-  character(len=MAXSTRLEN)          :: varnameids(size_of_varname)
-  character(len=MAXSTRLEN)          :: varnamelongnames(size_of_varname)
-  integer                           :: ierr,i
+   integer(kind=c_int), intent(in) :: ioncid
+   integer(kind=c_int), intent(in) :: meshid
+   type(c_ptr),         value      :: c_branchidx, c_offset, c_nodesinfo_ptr, c_coordx, c_coordy
+   integer(kind=c_int), intent(in) :: nmeshpoints
+   integer(kind=c_int), intent(in) :: startIndex
+   integer(kind=c_int)             :: ierr
 
-  call c_f_pointer(c_branchidx, branchidx, (/ nmeshpoints /))
-  call c_f_pointer(c_offset, offset, (/ nmeshpoints /))
-  call c_f_pointer(c_coordx, coordx, (/ nmeshpoints /))
-  call c_f_pointer(c_coordy, coordy, (/ nmeshpoints /))
+   ! Fortran-side pointers
+   integer,          pointer :: branchidx(:), offset(:)
+   real(kind=c_double), pointer :: coordx(:), coordy(:)
+   type(t_ug_charinfo), pointer :: nodesinfo(:)
 
-  ierr = ionc_get_1d_mesh_discretisation_points_ugrid_v1(ioncid, meshid, branchidx, offset, startIndex, coordx, coordy )
+   ! Map all C pointers
+   call c_f_pointer(c_branchidx, branchidx, [nmeshpoints])
+   call c_f_pointer(c_offset,    offset,    [nmeshpoints])
+   call c_f_pointer(c_nodesinfo_ptr, nodesinfo, [nmeshpoints])
+   call c_f_pointer(c_coordx,    coordx,    [nmeshpoints])
+   call c_f_pointer(c_coordy,    coordy,    [nmeshpoints])
 
-  !The names of the variables are hard-coded
-
-  varnameids(1) = 'node_id'
-  varnameids(2) = 'node_ids'
-
-  do i=1,size_of_varname
-     ierr = ionc_get_var_chars(ioncid, meshid, varnameids(i), nodeids)
-     if (ierr==0) then
-          exit
-     endif
-  enddo
-
-  varnamelongnames(1) = 'node_long_name'
-  varnamelongnames(2) = 'node_long_names'
-
-  do i=1,size_of_varname
-     ierr = ionc_get_var_chars(ioncid, meshid, varnamelongnames(i), nodelongnames)
-     if (ierr == 0) then
-          exit
-     endif
-  enddo
-
-  do i=1,nmeshpoints
-     nodesinfo(i)%id       = nodeids(i)
-     nodesinfo(i)%longname = nodelongnames(i)
-  end do
-
-end function ionc_get_1d_mesh_discretisation_points_v1_dll
+   ierr = ionc_get_1d_mesh_discretisation_points_v1(ioncid, meshid, branchidx, offset, nodesinfo, startIndex, coordx, coordy)
+end function
 
 function ionc_get_1d_mesh_discretisation_points_v2_dll(ioncid, meshid, c_branchidx, c_offset, c_ids, c_longNames, nmeshpoints, startIndex, c_coordx, c_coordy) result(ierr) bind(C, name="ionc_get_1d_mesh_discretisation_points_v2")
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_get_1d_mesh_discretisation_points_v2_dll

@@ -72,7 +72,7 @@
          elseif (iform .eq. 2) then
            open (newunit=iunit, File=Name, Status='Old',mode='Read', Form='Unformatted')
          else
-           open (newunit=iunit, File=Name, Status='Old',mode='Read', Form='Binary')
+           open (newunit=iunit, File=Name, Status='Old',mode='Read', form='unformatted')
          endif
       elseif (icheck .eq. 2) then
          if (iform .eq. 1) then
@@ -80,7 +80,7 @@
          elseif (iform .eq. 2) then
             open (newunit=iunit, File=Name, Status='Unknown', Form='Unformatted')
          elseif (iform .eq. 3) then
-            open (newunit=iunit, File=Name, Status='Unknown', Form='Binary')
+            open (newunit=iunit, File=Name, Status='Unknown', form='unformatted')
          endif
       elseif (icheck .eq. 3) then
          if (iform .eq. 1) then
@@ -88,7 +88,7 @@
          elseif (iform .eq. 2) then
             open (newunit=iunit, File=Name, Status='Unknown', Form='Unformatted')
          elseif (iform .eq. 3) then
-            open (newunit=iunit, File=Name, Status='Unknown', Form='Binary')
+            open (newunit=iunit, File=Name, Status='Unknown', form='unformatted')
          endif
       endif
 !
@@ -99,7 +99,7 @@
          elseif (iform .eq. 2) then
            open (newunit=iunit, File=Name, Status='Old',mode='Read', Form='Unformatted')
          else
-           open (newunit=iunit, File=Name, Status='Old',mode='Read', Form='Binary')
+           open (newunit=iunit, File=Name, Status='Old',mode='Read', form='unformatted')
          endif
       elseif (icheck .eq. 2) then
          if (iform .eq. 1) then
@@ -107,7 +107,7 @@
          elseif (iform .eq. 2) then
             open (newunit=iunit, File=Name, Status='Unknown', Form='Unformatted')
          elseif (iform .eq. 3) then
-            open (newunit=iunit, File=Name, Status='Unknown', Form='Binary')
+            open (newunit=iunit, File=Name, Status='Unknown', form='unformatted')
          endif
       elseif (icheck .eq. 3) then
          if (iform .eq. 1) then
@@ -115,7 +115,7 @@
          elseif (iform .eq. 2) then
             open (newunit=iunit, File=Name, Status='Unknown', Form='Unformatted')
          elseif (iform .eq. 3) then
-            open (newunit=iunit, File=Name, Status='Unknown', Form='Binary')
+            open (newunit=iunit, File=Name, Status='Unknown', form='unformatted')
          endif
       endif
 !

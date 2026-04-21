@@ -151,7 +151,7 @@ subroutine sawrhi(nsaman ,nsamap ,nsatim ,ngrid  ,itim   ,istep  ,&
          lun  = 54
          if ( salini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = sltmap , form = 'binary')
+            open(lun , file = sltmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = sltmap , form = 'unformatted')
@@ -223,7 +223,7 @@ subroutine sawrhi(nsaman ,nsamap ,nsatim ,ngrid  ,itim   ,istep  ,&
          lun  = 55
          if ( salini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = slthis , form = 'binary')
+            open(lun , file = slthis , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = slthis , form = 'unformatted')

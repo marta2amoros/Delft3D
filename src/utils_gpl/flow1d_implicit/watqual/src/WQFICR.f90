@@ -78,7 +78,7 @@ subroutine wqficr ( lu, filnam )
 !     Binary files for unix
 !
 #if defined (USE_MSWINDOWS)
-   open ( unit = lu, file = filnam, form = 'BINARY' )
+   open ( unit = lu, file = filnam, form = 'unformatted' )
 #else
    open ( unit = lu, file = filnam, form = 'UNFORMATTED' )
 #endif

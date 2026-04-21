@@ -307,16 +307,16 @@ module test_time_module
 
       subroutine test_ymd2modified_jul_string_valid
          integer, parameter           :: nr_cases = 9
-         character(len=16), parameter :: date(nr_cases) = (/ &
+         character(len=16), parameter :: date(nr_cases) = [character(len=16) :: &
             "20200904        ", &   ! no separat
-            "0020200904        ", & ! no separators, six digit year
+            "0020200904      ", &   ! no separators, six digit year (TRUNCATED TO 16)
             "2020-09-04      ", &   ! - separators
             "2020-09-4       ", &   ! - separators, one digit day, two digit month
             "2020-9-4        ", &   ! - seperators, one digit day, one digit month
-            "2020-9-004       ", &  ! - separator, three digit day, one digit month
+            "2020-9-004      ", &   ! - separator, three digit day, one digit month
             "2020 9 04       ", &   ! space separator, two digit day, one digit month
-            "002020 9 04       ", & ! space separator, six digit year
-            "2020/9/04       "/)    ! / separator, one digit day, two digit month
+            "002020 9 04     ", &   ! space separator, six digit year
+            "2020/9/04       "]     ! / separator, one digit day, two digit month
          real(kind=hp), parameter :: mjd_expected = 59096.0_hp
          integer                  :: i
          logical                  :: ok

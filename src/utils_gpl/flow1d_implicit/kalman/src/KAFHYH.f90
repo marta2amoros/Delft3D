@@ -179,7 +179,7 @@ subroutine KAFHYH(nfhymn ,nkfhmp ,nkfhtm ,ngrid  ,&
 ! In Microsoft Powerstation Unit 64 does not work!
             if ( kalini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-               open(lun , file = fihmap , form = 'binary')
+               open(lun , file = fihmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
                open(lun , file = fihmap , form = 'unformatted')
@@ -255,7 +255,7 @@ subroutine KAFHYH(nfhymn ,nkfhmp ,nkfhtm ,ngrid  ,&
             lun  = 65
             if ( kalini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-               open(lun , file = fihhis , form = 'binary')
+               open(lun , file = fihhis , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
                open(lun , file = fihhis , form = 'unformatted')

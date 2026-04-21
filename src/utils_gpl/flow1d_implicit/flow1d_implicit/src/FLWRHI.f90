@@ -201,7 +201,7 @@ subroutine flwrhi ( h2     , q2     , ngrid  , itim   , flwini ,&
          lun  = 50
          if ( flwini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = flwmap , form = 'binary')
+            open(lun , file = flwmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = flwmap , form = 'unformatted')
@@ -349,7 +349,7 @@ subroutine flwrhi ( h2     , q2     , ngrid  , itim   , flwini ,&
          lun  = 51
          if ( flwini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = flwhis , form = 'binary')
+            open(lun , file = flwhis , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = flwhis , form = 'unformatted')
@@ -509,7 +509,7 @@ subroutine flwrhi ( h2     , q2     , ngrid  , itim   , flwini ,&
          lun  = 52
          if ( flwini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = fstrhs , form = 'binary')
+            open(lun , file = fstrhs , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = fstrhs , form = 'unformatted')
@@ -564,7 +564,7 @@ subroutine flwrhi ( h2     , q2     , ngrid  , itim   , flwini ,&
          lun  = 53
          if ( flwini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = fqlths , form = 'binary')
+            open(lun , file = fqlths , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = fqlths , form = 'unformatted')

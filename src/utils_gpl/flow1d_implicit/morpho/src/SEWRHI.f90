@@ -159,7 +159,7 @@ subroutine sewrhi(nseman ,nsemap ,nsetim ,ngrid  ,nbran  ,nsedrd ,&
          lun  = 56
          if ( sedini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = sdtmap , form = 'binary')
+            open(lun , file = sdtmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = sdtmap , form = 'unformatted')

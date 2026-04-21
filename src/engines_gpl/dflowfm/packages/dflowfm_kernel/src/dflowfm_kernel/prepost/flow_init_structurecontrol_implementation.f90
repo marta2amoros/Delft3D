@@ -29,6 +29,7 @@
 !> submodule that contains the implementation of flow_init_structurecontrol.
 submodule(m_flow_init_structurecontrol) flow_init_structurecontrol_implementation
    use precision_basics, only: dp
+   use iso_c_binding
    implicit none
 
 contains

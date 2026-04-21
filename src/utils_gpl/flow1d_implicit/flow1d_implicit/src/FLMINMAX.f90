@@ -133,7 +133,7 @@ subroutine FLMINMAX (kode  ,ngrid ,istep ,nstep ,dt    ,itim  ,&
 !
          lun  = 31
 #if defined (USE_MSWINDOWS)
-         open(lun , file = minmax , form = 'binary')
+         open(lun , file = minmax , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
          open(lun , file = minmax , form = 'unformatted')

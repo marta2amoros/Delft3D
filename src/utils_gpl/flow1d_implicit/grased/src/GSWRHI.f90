@@ -174,7 +174,7 @@ subroutine gswrhi (nseman ,nsemap ,nsetim ,ngrid ,nlayer ,ngrain ,&
          lun  = 110
          if ( sedini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = gsedmap , form = 'binary')
+            open(lun , file = gsedmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = gsedmap , form = 'unformatted')
@@ -302,7 +302,7 @@ subroutine gswrhi (nseman ,nsemap ,nsetim ,ngrid ,nlayer ,ngrain ,&
          lun  = 111
          if ( sedini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = gsedhis , form = 'binary')
+            open(lun , file = gsedhis , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = gsedhis , form = 'unformatted')

@@ -244,7 +244,7 @@ else
 !
   if(qual(2:2) == 'F') cform = 'formatted'
   if(qual(2:2) == 'U') cform = 'unformatted'
-  if(qual(2:2) == 'B') cform = 'binary'          ! extension to FORTRAN 95 standard
+  if(qual(2:2) == 'B') cform = 'unformatted'          ! extension to FORTRAN 95 standard
   if(qual(2:2) == 'R') cform = 'unformatted'
 !
 !  Check if file exists

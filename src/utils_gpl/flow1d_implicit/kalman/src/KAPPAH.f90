@@ -162,7 +162,7 @@ subroutine KAPPAH(nppamn ,nkppmp ,nkpptm ,ngrid  ,&
          lun  = 62
          if ( kalini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = prpmap , form = 'binary')
+            open(lun , file = prpmap , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = prpmap , form = 'unformatted')
@@ -233,7 +233,7 @@ subroutine KAPPAH(nppamn ,nkppmp ,nkpptm ,ngrid  ,&
          lun  = 63
          if ( kalini(ifil) .eq. 0 ) then
 #if defined (USE_MSWINDOWS)
-            open(lun , file = prphis , form = 'binary')
+            open(lun , file = prphis , form = 'unformatted')
 #else
 #if defined (USE_HPUX)
             open(lun , file = prphis , form = 'unformatted')
