@@ -2,6 +2,7 @@ include_directories(${mpi_module_path})
 
 set(library_name deltares_common_mpi)
 
+
 create_target(${library_name} ${CMAKE_CURRENT_SOURCE_DIR} src_dir src)
 
 # Set preprocessor definitions

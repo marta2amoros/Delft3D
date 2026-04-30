@@ -267,7 +267,7 @@ contains
 !! Add initialization/default values for all module variables here.
    subroutine resetModel()
       use m_trachy, only: trtdef_ptr
-      use unstruc_netcdf, only: UNC_CONV_UGRID
+      use m_structures_indices, only: UNC_CONV_UGRID
       use unstruc_channel_flow
       use m_fm_icecover, only: fm_ice_null
       use m_start_parameters, only: md_jaautostart, MD_AUTOSTARTSTOP, MD_NOAUTOSTART
@@ -397,11 +397,69 @@ contains
 
    end subroutine resetModel
 
+   subroutine loadNetworkForModel(filename, istat, jadoorladen)
+      use precision, only: dp
+      use m_clearflowmodelinputs, only: clearflowmodelinputs
+      use m_closeworld, only: closeworld
+      use messagehandling, only: LEVEL_WARN, mess
+      use m_missing
+      use gridoperations
+      use m_network, only: admin_network
+      use unstruc_channel_flow, only: network
+      use m_qnerror
+      use m_set_nod_adm
+      use network_data
+
+      implicit none
+
+      character(*), intent(in) :: filename
+      integer, intent(out) :: istat
+      integer, intent(in) :: jadoorladen
+
+      integer :: iDumk
+      integer :: iDuml
+      integer :: K0, L0, NUMKN, NUMLN
+      logical :: jawel
+      external :: unc_read_net_wrapper, md5_net_file_wrapper
+
+      call clearflowmodelinputs()
+
+      inquire (file=filename, exist=jawel)
+      if (.not. jawel) then
+         call mess(LEVEL_WARN, 'could not open '''//trim(filename)//'''')
+         return
+      end if
+
+      if (jadoorladen == 0) then
+         K0 = 0
+         L0 = 0
+      else
+         K0 = numk
+         L0 = numl
+      end if
+
+      call unc_read_net_wrapper(filename, K0, L0, NUMKN, NUMLN, istat)
+      call md5_net_file_wrapper(L0 + 1, NUMLN)
+
+      iDumk = 0
+      iDuml = 0
+      call admin_network(network, iDuml)
+
+      if (istat == 0) then
+         numk = K0 + NUMKN
+         numl = L0 + NUMLN
+         call setnodadm(0)
+      else
+         call qnerror('Error while loading network from '''//trim(filename)//''', please inspect the preceding diagnostic output.', ' ', ' ')
+      end if
+      call closeworld()
+      netstat = NETSTAT_CELLS_DIRTY
+   end subroutine loadNetworkForModel
+
 !> Loads a model definition from file and makes it active.
    subroutine loadModel(filename)
       use timers
       use m_readstructures
-      use m_netw
       use m_observations, only: loadobservations, deleteobservations
       use m_monitoring_crosssections
       use m_monitoring_runupgauges
@@ -420,7 +478,8 @@ contains
       use unstruc_caching
       use m_longculverts, only: initialize_long_culverts
       use unstruc_channel_flow
-      use unstruc_netcdf, only: unc_meta_net_file
+      use m_structures_indices, only: unc_meta_net_file
+      use network_data, only: kn, numl, zk
       use system_utils, only: remove_path
       use m_delpol
       use m_reapol
@@ -465,7 +524,7 @@ contains
 
       timerHandle = 0
       call timstrt('Load network', timerHandle)
-      call loadNetwork(md_netfile, istat, jadoorladen)
+      call loadNetworkForModel(md_netfile, istat, jadoorladen)
       if (istat == 0) then
          ! Pass a copy of netfile name to unstruc_netcdf to avoid cyclic dependency.
          call remove_path(md_netfile, unc_meta_net_file)
@@ -668,7 +727,6 @@ contains
       use m_flowgeom !,              only : wu1Duni, bamin, rrtol, jarenumber, VillemonteCD1, VillemonteCD2
       use m_flowtimes
       use m_flowparameters
-      use m_dambreak_breach, only: set_dambreak_widening_method
       use m_waves, only: rouwav, gammax, hminlw, jauorb, jahissigwav, jamapsigwav
       use m_wind, only: wind_drag_type, cdb, wdb, jaheat_eachstep, relativewind, jawindhuorzwsbased, jawindpartialdry, rhoair, pavini, pavbnd, &
           jastresstowind, update_wind_stress_each_time_step, ja_computed_airdensity, jarain, jaqin, jaqext,jaevap, jawind, &
@@ -680,7 +738,7 @@ contains
       use m_sferic, only: anglat, anglon, jasfer3D
       use m_alloc
       use m_equatorial
-      use m_netw, only: Makeorthocenters, strip_mesh
+      use network_data, only: Makeorthocenters, strip_mesh
       use m_partitioninfo
       use m_fixedweirs
       use m_trachy, only: trtdef_ptr
@@ -692,7 +750,12 @@ contains
       use m_heatfluxes
       use m_fm_wq_processes
       use m_xbeach_avgoutput
-      use unstruc_netcdf, only: UNC_CONV_CFOLD, UNC_CONV_UGRID, unc_set_ncformat, unc_set_nccompress, unc_writeopts, UG_WRITE_LATLON, UG_WRITE_NOOPTS, unc_nounlimited, unc_noforcedflush, unc_uuidgen, unc_metadatafile
+      use m_structures_indices, only: UNC_CONV_CFOLD, UNC_CONV_UGRID, unc_cmode, unc_metadatafile, &
+                                      unc_nccompress, unc_noforcedflush, unc_nounlimited, unc_uuidgen, &
+                                      unc_writeopts
+      use io_ugrid, only: UG_WRITE_LATLON, UG_WRITE_NOOPTS
+      use netcdf, only: nf90_netcdf4
+      use netcdf_utils, only: ncu_format_to_cmode
       use dfm_error
       use unstruc_messages, only: unstruc_errorhandler, loglevel_StdOut
       use system_utils, only: split_filename
@@ -1440,7 +1503,7 @@ contains
       md_dambreak_widening_method = ''
       call prop_get(md_ptr, 'physics', 'BreachGrowth', md_dambreak_widening_method)
       call str_lower(md_dambreak_widening_method)
-      call set_dambreak_widening_method(md_dambreak_widening_method)
+      call set_dambreak_widening_method_wrapper(md_dambreak_widening_method)
 
       ierror = DFM_NOERR
 
@@ -1946,14 +2009,17 @@ contains
       end if
 
       call prop_get(md_ptr, 'output', 'NcFormat', md_ncformat, success)
-      call unc_set_ncformat(md_ncformat)
+      unc_cmode = ncu_format_to_cmode(md_ncformat)
       call prop_get(md_ptr, 'output', 'NcMapDataPrecision', md_nc_map_precision, success)
       call prop_get(md_ptr, 'output', 'NcHisDataPrecision', md_nc_his_precision, success)
       call prop_get(md_ptr, 'output', 'NcCompression', md_nccompress, success, value_parsed)
       if (success .and. .not. value_parsed) then
          call mess(LEVEL_ERROR, 'Did not recognise NcCompression value. It must be 0 or 1.')
       end if
-      call unc_set_nccompress(md_nccompress)
+      if (md_nccompress .and. unc_cmode /= nf90_netcdf4) then
+         call mess(LEVEL_ERROR, 'NetCDF compression (deflation) is a NetCDF4 feature; make sure NcFormat is set to 4.')
+      end if
+      unc_nccompress = md_nccompress
 
       call prop_get(md_ptr, 'output', 'enableDebugArrays', jawritedebug, success) ! allocate 1d, 2d, 3d arrays to quickly write quantities to map file
       call prop_get(md_ptr, 'output', 'NcNoUnlimited', unc_nounlimited, success)
@@ -2630,11 +2696,13 @@ contains
       use m_circumcenter_method, only: circumcenter_method
       use m_sferic, only: anglat, anglon, jsferic, jasfer3D
       use m_density_parameters, only: apply_thermobaricity
-      use unstruc_netcdf, only: unc_writeopts, UG_WRITE_LATLON, UG_WRITE_NOOPTS, unc_nounlimited, unc_noforcedflush, unc_uuidgen, unc_metadatafile
+      use m_structures_indices, only: unc_metadatafile, unc_noforcedflush, unc_nounlimited, unc_uuidgen, &
+                                      unc_writeopts
+      use io_ugrid, only: UG_WRITE_LATLON, UG_WRITE_NOOPTS
       use dflowfm_version_module
       use m_equatorial
       use m_sediment
-      use m_netw, only: Makeorthocenters, strip_mesh
+      use network_data, only: Makeorthocenters, strip_mesh
       use m_fixedweirs
       use m_reduce, only: maxdge
       use m_grw
@@ -4008,7 +4076,7 @@ contains
       use m_partitioninfo, only: jampi, numranks, sdmn
       use MessageHandling, only: LEVEL_ERROR, mess
       use system_utils, only: FILESEP
-      use unstruc_netcdf, only: unc_meta_md_ident
+      use m_structures_indices, only: unc_meta_md_ident
 
       character(*), intent(inout) :: filename !< Name of file to be read (in current directory or with full path).
                                               !! in case of parallel computing, the partition number is inserted.

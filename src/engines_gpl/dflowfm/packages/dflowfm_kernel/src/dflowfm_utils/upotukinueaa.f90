@@ -42,10 +42,13 @@ contains
 
    subroutine upotukinueaa(upot, ukin, ueaa)
       use precision, only: dp
-      use m_flow, only: s1, ucx, ucy, ag, hs, ktop, kbot, vol1, jasal, rho, rhomean, &
-                        zws, kmx, upot0, ukin0
+      use m_flow_link_data, only: s1, ucx, ucy, hs, vol1, zws
+      use m_flow_vertical_data, only: ktop, kbot, kmx
+      use m_flowparameters, only: jasal, upot0, ukin0
       use m_flowgeom, only: ndx, bl
       use m_missing, only: dmiss
+      use m_physcoef, only: ag, rhomean
+      use m_turbulence, only: rho
 
       real(kind=dp) :: upot, ukin, ueaa
       real(kind=dp) :: vtot, roav, zz, rhok, bmin

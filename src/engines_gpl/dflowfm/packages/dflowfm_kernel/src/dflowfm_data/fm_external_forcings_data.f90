@@ -27,7 +27,10 @@
 !
 !-------------------------------------------------------------------------------
 module fm_external_forcings_data
+   use fm_external_1d2d_data
+   use fm_external_qhbnd_data
    use precision, only: dp
+   use fm_external_boundary_data
    use m_bnd, only: bndtype
 
    implicit none
@@ -69,7 +72,6 @@ module fm_external_forcings_data
    integer, allocatable :: ket(:) !< temp (numl) edge oriented t tang.  vel.
    integer, allocatable :: keuxy(:) !< temp (numl) edge oriented uxuy vel.
    integer, allocatable :: ken(:) !< temp (numl) edge oriented n normal vel.
-   integer, allocatable, target :: ke1d2d(:) !< temp (numl) edge oriented 1d2d bnd
    integer, allocatable :: keg(:) !< temp (numl) edge oriented g gate
    integer, allocatable :: ked(:) !< temp (numl) edge oriented d cdam
    integer, allocatable :: kegen(:) !< temp (numl) edge oriented general structure
@@ -98,21 +100,12 @@ module fm_external_forcings_data
    real(kind=dp), allocatable :: thrtt(:) !< temp array for Thatcher-Harleman return time readout, stores return times
    integer, allocatable :: thrtn(:) !< temp array for Thatcher-Harleman return time readout, stores cell indices (first one)
 
-   integer, target :: nzbnd !< number of waterlevel boundary segments
-   integer, target :: nbndz !< waterlevel boundary points dimension
    real(kind=dp), allocatable :: xbndz(:) !< waterlevel boundary points xcor
    real(kind=dp), allocatable :: ybndz(:) !< waterlevel boundary points ycor
    real(kind=dp), allocatable, target :: zbndz(:) !< [m] waterlevel boundary points function  {"location": "edge", "shape": ["nbndz"]}
    real(kind=dp), allocatable :: zbndz0(:) !< waterlevel boundary points function
    real(kind=dp), allocatable :: xy2bndz(:, :) !< waterlevel boundary 'external tolerance point'
    integer, allocatable :: kdz(:) !< waterlevel boundary points temp array
-   integer, allocatable, target :: kbndz(:, :) !< waterlevel boundary points index array
-                                                        !! 1,* = index in s1 boundary point
-                                                        !! 2,* = index in s1 first point on the inside
-                                                        !! 3,* = index in u1 of their connecting link (always positive to the inside)
-                                                        !! 4,* = type indicator (see m_boundary_condition_type)
-                                                        !! 5,* = member of boundary number somuch of this type
-                                                        !! 6,* = riemann relaxation time for this point (s)
    real(kind=dp), allocatable :: zkbndz(:, :) !< only for jaceneqtr == 2 : left and right vertical netnode zk levels
    real(kind=dp) :: zbndzval1 = -999.0_dp, zbndzval2 = -999.0_dp
    integer, allocatable :: kbanz(:, :) !< ban pointer 2,*
@@ -126,16 +119,7 @@ module fm_external_forcings_data
    real(kind=dp), allocatable :: zbndu0(:) !< velocity   boundary points function in start time
    real(kind=dp), allocatable :: xy2bndu(:, :) !< velocity   boundary 'external tolerance point'
    integer, allocatable :: kdu(:) !< velocity   boundary points temp array
-   integer, allocatable :: kbndu(:, :) !< velocity   boundary points index array, see lines above
-   integer, allocatable :: L1qbnd(:) !< first  nbndu point in discharge bnd nqbnd
-   integer, allocatable :: L2qbnd(:) !< second nbndu point in discharge bnd nqbnd
-   real(kind=dp), allocatable :: at_all(:) !< "at" for all qbnd's, dim(nqbnd)
-   real(kind=dp), allocatable :: at_sum(:) !< "at" for all qbnd's, summed over all domains, dim(nqbnd)
-   real(kind=dp), allocatable :: wwssav_all(:, :) !< "wwav" and "ssav" for all qnbd's, dim(2,nqbnd)
-   real(kind=dp), allocatable :: wwssav_sum(:, :) !< "wwav" and "ssav" for all qnbd's, summed over all domains, dim(2,nqbnd)
-   integer :: japartqbnd !< one or more of the discharge boundaries is partitioned (1) or not (0)
    real(kind=dp), allocatable :: huqbnd(:) !< hu used in normalised Manning discharge boundary condition, based on average water-level
-   integer :: nqbnd !<
    real(kind=dp) :: qbndhutrs = 0.1_dp !< only discharge bnd here if hu>qbndhutrs
    real(kind=dp), allocatable :: zkbndu(:, :) !< only for jaceneqtr == 2 : left and right vertical netnode zk levels
    integer, allocatable :: kbanu(:, :) !< ban pointer 2,*
@@ -368,17 +352,14 @@ module fm_external_forcings_data
                                                         !!                        5 = velocity   Riemann boundary
                                                         !!                        6 = waterlevel outflow
                                                         !!                        7 = q-h boundary
-   integer :: nqhbnd !< number of qh boundaries
    character(len=255), allocatable :: qhpliname(:) !< name of the location extracted from the pli-file
    integer, allocatable :: L1qhbnd(:) !< first  nbndz point in discharge bnd nqbnd
    integer, allocatable :: L2qhbnd(:) !< second nbndz point in discharge bnd nqbnd
    real(kind=dp), allocatable, target :: qhbndz(:) !< temporary array for storing boundary values per qh boundary segment
    real(kind=dp), allocatable :: qhbndz_plus(:) !< temporary array for calculating the slope of the QH relation
    real(kind=dp), allocatable :: qhbndz_min(:) !< temporary array for calculating the slope of the QH relation
-   real(kind=dp), allocatable, target :: atqh_all(:) !< temporary array for computing discharge through the QH boundary per domain
    real(kind=dp), allocatable :: q_org(:) !< temporary array for saving the discharge through the QH boundary per domain
    real(kind=dp), allocatable :: qh_gamma(:) !< temporary array for saving the slope of the QH-relation
-   real(kind=dp), allocatable :: atqh_sum(:) !< temporary array for computing total discharge through qh boundary
 
    integer :: nwbnd !< number of wave-energy boundaries
    character(len=255), dimension(:), allocatable :: fnamwbnd !< polyline filenames associated with wave-energy boundary
@@ -437,8 +418,6 @@ contains
 !! For external forcings it is equivalent with reset_flowexternalforcings().
    subroutine default_fm_external_forcing_data()
 
-      use m_dambreak_breach, only: reset_dambreak_counters
-
       jatimespace = 0 ! doen ja/nee 1/0
       mhis = 0 ! unit nr external forcings history *.exthis
       numbnp = 0 ! total nr of open boundary cells for network extension
@@ -468,7 +447,6 @@ contains
       ngenstru = 0 ! nr of real general structures in the generalstructure set
       npump = 0 ! npump dimension
       npumpsg = 0 ! nr of pump signals
-      call reset_dambreak_counters()
       nklep = 0 ! nr of kleps
       nvalv = 0 ! nr of valves
       nqbnd = 0 ! nr of q bnd's

@@ -42,7 +42,7 @@ contains
 
    subroutine getfetch(k, U10, FetchL, FetchD) !and windspeed
       use precision, only: dp
-      use m_flow, only: Hs
+      use m_flow_link_data, only: hs
       use m_waves, only: fetch, nwf, fetdp
       use m_sferic, only: twopi
       use m_get_link1, only: getlink1

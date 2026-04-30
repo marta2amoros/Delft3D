@@ -30,6 +30,8 @@
 !
 !> holds indices for all structure types
 module m_structures_indices
+   use precision_basics, only: dp
+   use properties, only: tree_data
 
    implicit none
 
@@ -142,5 +144,51 @@ module m_structures_indices
    integer :: NUMVALS_GATE = 5 !< Number of variables for gate
    integer :: NUMVALS_CDAM = 4 !< Number of variables for controble dam
    integer :: NUMVALS_CGEN = 4 !< Number of variables for general structure (old ext file)
+
+   integer :: n_db_links = 0 !< number of dambreak links
+   integer :: n_db_signals = 0 !< number of dambreak signals
+   type(tree_data), pointer :: strs_ptr !< A property list with all input structure specifications of the current model.
+
+   integer, parameter :: UNC_CONV_CFOLD = 1 !< Old CF-only conventions.
+   integer, parameter :: UNC_CONV_UGRID = 2 !< New CF+UGRID conventions.
+   integer :: unc_cmode = 0 !< Default NetCDF creation mode flag value.
+   logical :: unc_nccompress !< Whether or not to apply compression to NetCDF output files.
+   integer :: unc_nounlimited !< NetCDF output with full-length time dimension.
+   integer :: unc_noforcedflush !< Do not force NetCDF file flushing every output timestep.
+   integer :: unc_writeopts !< Default write options.
+   integer :: unc_uuidgen !< Generate UUID and store into each newly created NetCDF file.
+   character(len=255) :: unc_metadatafile !< Input metadata NetCDF file to include in output files.
+   character(len=64) :: unc_meta_md_ident !< Identifier of the model, for metadata pattern substitution.
+   character(len=64) :: unc_meta_net_file !< Filename of input net/grid file, for metadata pattern substitution.
+
+   !> Whether or not the model has any structures that lie across multiple partitions.
+   !! Needed to disable possibly invalid statistical output items.
+   logical :: model_has_weirs_across_partitions = .false.
+   logical :: model_has_general_structures_across_partitions = .false.
+   logical :: model_has_orifices_across_partitions = .false.
+   logical :: model_has_universal_weirs_across_partitions = .false.
+   logical :: model_has_culverts_across_partitions = .false.
+   logical :: model_has_pumps_across_partitions = .false.
+   logical :: model_has_bridges_across_partitions = .false.
+   logical :: model_has_long_culverts_across_partitions = .false.
+   logical :: model_has_dams_across_partitions = .false.
+   logical :: model_has_dambreaks_across_partitions = .false.
+   logical :: model_has_gates_across_partitions = .false.
+   logical :: model_has_compound_structures_across_partitions = .false.
+
+   real(kind=dp), dimension(:, :), allocatable, target :: valgenstru
+   real(kind=dp), dimension(:, :), allocatable, target :: valweirgen
+   real(kind=dp), dimension(:, :), allocatable, target :: valorifgen
+   real(kind=dp), dimension(:, :), allocatable, target :: valbridge
+   real(kind=dp), dimension(:, :), allocatable, target :: valdambreak
+   real(kind=dp), dimension(:, :), allocatable, target :: valculvert
+   real(kind=dp), dimension(:, :), allocatable, target :: valuniweir
+   real(kind=dp), dimension(:, :), allocatable, target :: valgategen
+   real(kind=dp), dimension(:, :), allocatable, target :: valcmpstru
+   real(kind=dp), dimension(:, :), allocatable, target :: valpump
+   real(kind=dp), dimension(:, :), allocatable, target :: vallongculvert
+   real(kind=dp), dimension(:, :), allocatable, target :: valgate
+   real(kind=dp), dimension(:, :), allocatable, target :: valcdam
+   real(kind=dp), dimension(:, :), allocatable :: valcgen
 
 end module m_structures_indices

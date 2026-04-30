@@ -253,7 +253,7 @@ contains
 !! this subroutine is comparable with subroutine HEA_ICE.F90 of the Delft3D-FLOW ice module
    subroutine preprocess_icecover(n, Qlong_ice, tempwat, saltcon, wind)
       use MessageHandling
-      use m_flow, only: hu
+      use m_flow_link_data, only: hu
       use m_flowgeom, only: nd
       use m_physcoef, only: vonkar
       use physicalconsts, only: celsius_to_kelvin, kelvin_to_celsius

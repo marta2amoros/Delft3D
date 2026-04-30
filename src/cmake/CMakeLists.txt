@@ -129,30 +129,49 @@ if (UNIX)
     find_package(PkgConfig REQUIRED)
 
     #MPI
-    find_package(MPI REQUIRED)
-    add_definitions(-DHAVE_MPI)
-    set(mpi_module_path ${mpi_include_path})
+    find_package(MPI)
+    if(MPI_FOUND)
+        add_definitions(-DHAVE_MPI)
+        set(mpi_module_path ${mpi_include_path})
+    else()
+        message(WARNING "MPI not found, proceeding without MPI support")
+    endif()
 
     #NetCDF
-    pkg_check_modules(NETCDF     REQUIRED netcdf)
-    pkg_check_modules(NETCDF_FTN REQUIRED netcdf-fortran)
+    pkg_check_modules(NETCDF     netcdf)
+    pkg_check_modules(NETCDF_FTN netcdf-fortran)
+    pkg_check_modules(HDF5       hdf5)
+    pkg_check_modules(HDF5_HL    hdf5_hl)
 
     # Create two separate targets, because the targets created by pkg_check_modules with IMPORTED_TARGET
     # mix variables for both static and dynamic linking of netcdf, and the C library is not explicitly
     # linked by the Fortran target. Use the same names as on windows.
-    add_library(netcdf INTERFACE)
-    target_include_directories(netcdf INTERFACE ${NETCDF_INCLUDE_DIRS})
-    target_link_libraries(netcdf INTERFACE ${NETCDF_LINK_LIBRARIES})
+    if(NETCDF_FOUND)
+        add_library(netcdf INTERFACE)
+        target_include_directories(netcdf INTERFACE ${NETCDF_INCLUDE_DIRS})
+        target_link_directories(netcdf INTERFACE
+            ${NETCDF_LIBRARY_DIRS}
+            ${HDF5_LIBRARY_DIRS}
+            ${HDF5_HL_LIBRARY_DIRS}
+        )
+        target_link_libraries(netcdf INTERFACE
+            ${NETCDF_LINK_LIBRARIES}
+            ${HDF5_HL_LINK_LIBRARIES}
+            ${HDF5_LINK_LIBRARIES}
+        )
 
-    add_library(netcdff INTERFACE)
-    target_include_directories(netcdff INTERFACE ${NETCDF_FTN_INCLUDE_DIRS})
-    target_link_libraries(netcdff INTERFACE ${NETCDF_FTN_LINK_LIBRARIES} netcdf)
+        add_library(netcdff INTERFACE)
+        target_include_directories(netcdff INTERFACE ${NETCDF_FTN_INCLUDE_DIRS})
+        target_link_libraries(netcdff INTERFACE ${NETCDF_FTN_LINK_LIBRARIES} netcdf)
+    else()
+        message(WARNING "NetCDF not found, proceeding without NetCDF support")
+    endif()
 
     # Petsc
-    pkg_check_modules(PETSC REQUIRED PETSc)
+    pkg_check_modules(PETSC PETSc)
 
     # Proj
-    pkg_check_modules(proj REQUIRED proj)
+    pkg_check_modules(proj proj)
 endif(UNIX)
 
 if (UNIX)

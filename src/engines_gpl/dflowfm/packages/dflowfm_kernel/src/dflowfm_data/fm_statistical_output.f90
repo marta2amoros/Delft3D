@@ -2218,7 +2218,23 @@ contains
       use m_ug_nc_attribute
       use m_flow
       use fm_external_forcings_data
-      use m_structures
+      use m_flowparameters, only: jahiscgen, jahispump, jahisgate, jahiscdam, jahisweir, jahisdambreak, &
+                                  jahisorif, jahisculv, jahisuniweir, jahiscmpstru, jahislongculv, jahisbridge
+      use m_structures_indices, only: IVAL_AREA, IVAL_BLACTUAL, IVAL_BLDN, IVAL_BLUP, IVAL_CL_CRESTL, &
+                                      IVAL_CL_EDGEL, IVAL_CL_OPENH, IVAL_CL_STATE, IVAL_CRESTL, &
+                                      IVAL_CRESTW, IVAL_DB_CRESTH, IVAL_DB_CRESTW, IVAL_DB_DISCUM, &
+                                      IVAL_AREA_OPEN, IVAL_AREA_OVER, IVAL_AREA_UNDER, IVAL_DB_JUMP, &
+                                      IVAL_DB_TIMEDIV, IVAL_DIS, IVAL_DIS_OPEN, &
+                                      IVAL_DIS_OVER, IVAL_DIS_UNDER, IVAL_EDGEL, IVAL_FORCEDIF, &
+                                      IVAL_GATE_EDGEL, IVAL_GATE_FLOWH, IVAL_GATE_OPENW, IVAL_GATE_SILLH, &
+                                      IVAL_HEAD, IVAL_LC_VALVE, IVAL_OPENH, IVAL_OPENW, IVAL_PP_CAP, &
+                                      IVAL_PP_DISDIR, IVAL_PP_HEAD, IVAL_PP_RED, IVAL_PP_S1DEL, &
+                                      IVAL_PP_S1SUC, IVAL_PP_STAG, IVAL_S1DN, IVAL_S1ONCREST, IVAL_S1UP, &
+                                      IVAL_STATE, IVAL_UW_CRESTL, IVAL_UPPL, IVAL_VEL, IVAL_VEL_OPEN, &
+                                      IVAL_VEL_OVER, IVAL_VEL_UNDER, IVAL_WIDTH, valbridge, valcdam, &
+                                      valcmpstru, valculvert, valdambreak, valgate, valgategen, valgenstru, &
+                                      vallongculvert, valorifgen, valpump, valuniweir, valweirgen, n_db_signals
+      use unstruc_channel_flow, only: network
       use m_observations_data
       use m_density_parameters, only: apply_thermobaricity
       use m_statistical_output_types, only: process_data_interface_double
@@ -2233,7 +2249,6 @@ contains
       use m_laterals, only: numlatsg, qplat, qplatAve, qLatRealAve, qLatReal
       use m_sferic, only: jsferic
       use m_wind, only: air_pressure_available, jawind, jarain, ja_airdensity, ja_computed_airdensity, cloudiness, relative_humidity
-      use m_dambreak_breach, only: n_db_signals
       use m_waveconst
       use m_fm_icecover, only: ja_icecover, ICECOVER_NONE, ICECOVER_SEMTNER
       use, intrinsic :: iso_c_binding

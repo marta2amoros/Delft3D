@@ -26,23 +26,16 @@
 !  Deltares, and remain the property of Stichting Deltares. All rights reserved.
 !
 !-------------------------------------------------------------------------------
-
-!
-!
-module m_get_kbot_ktop
+module fm_external_boundary_data
    implicit none
-contains
-   elemental subroutine getkbotktop(n, kb, kt)
-      use m_flow_vertical_data, only: kmx, ktop, kbot
-      integer, intent(in) :: n
-      integer, intent(out) :: kb, kt
 
-      if (kmx == 0) then
-         kb = n
-         kt = n
-      else
-         kb = kbot(n)
-         kt = ktop(n)
-      end if
-   end subroutine getkbotktop
-end module m_get_kbot_ktop
+   integer, target :: nzbnd !< number of waterlevel boundary segments
+   integer, target :: nbndz !< waterlevel boundary points dimension
+   integer, allocatable, target :: kbndz(:, :) !< waterlevel boundary points index array
+                                                !! 1,* = index in s1 boundary point
+                                                !! 2,* = index in s1 first point on the inside
+                                                !! 3,* = index in u1 of their connecting link (always positive to the inside)
+                                                !! 4,* = type indicator (see m_boundary_condition_type)
+                                                !! 5,* = member of boundary number somuch of this type
+                                                !! 6,* = riemann relaxation time for this point (s)
+end module fm_external_boundary_data

@@ -41,51 +41,7 @@ module m_structures
    use precision, only: dp
    implicit none
 
-   type(tree_data), pointer, public :: strs_ptr !< A property list with all input structure specifications of the current model. Not the actual structure set.
    integer :: jaoldstr !< tmp backwards comp: we cannot mix structures from EXT and from structure-input files. Use one or the other.
-
-   real(kind=dp), dimension(:, :), allocatable, target :: valgenstru !< Array for general structure, (1:NUMVALS_GENSTRU,:), the first index include 1:NUMVALS_COMMON (see definitation at top),
-   !< and extra varaibles have indices: IVAL_S1ONCREST, IVAL_CRESTL, IVAL_CRESTW, IVAL_STATE,
-   !<                                   IVAL_FORCEDIF, IVAL_OPENW, IVAL_EDGEL, IVAL_OPENH,
-   !<                                   IVAL_UPPL, IVAL_DIS_OPEN, IVAL_DIS_OVER, IVAL_DIS_UNDER,
-   !<                                   IVAL_AREA_OPEN, IVAL_AREA_OVER, IVAL_AREA_UNDER, IVAL_VEL_OPEN, IVAL_VEL_OVER,
-   !<                                   IVAL_VEL_UNDER, IVAL_COUNT.
-   real(kind=dp), dimension(:, :), allocatable, target :: valweirgen !< Array for weir, (1:NUMVALS_WEIRGEN,:), the first index include 1:NUMVALS_COMMON (see definitation at top),
-   !< and extra varaibles have indices: IVAL_S1ONCREST, IVAL_CRESTL, IVAL_CRESTW, IVAL_STATE,
-   !<                                   IVAL_FORCEDIF, NUMVALS_WEIRGEN is the counter
-   real(kind=dp), dimension(:, :), allocatable, target :: valorifgen !< Array for orifice, (1:NUMVALS_ORIFGEN,:), the first index include 1:NUMVALS_COMMON (see definitation at top),
-   !< and extra varaibles have indices: IVAL_S1ONCREST, IVAL_CRESTL, IVAL_CRESTW, IVAL_STATE,
-   !<                                   IVAL_FORCEDIF, IVAL_OPENW, IVAL_EDGEL, IVAL_OPENH, the last one NUMVALS_ORIFGEN is the counter
-
-   real(kind=dp), dimension(:, :), allocatable, target :: valbridge !< Array for bridge(1:NUMVALS_BRIDGE,:), the first dimension of this array contains
-   !< NUMVALS_COMMON common variables (see definitation at top) and NUMEXTVALS_BRIDGE extra variables here.
-
-   real(kind=dp), dimension(:, :), allocatable, target :: valdambreak !< Array for dambreak, (1:NUMVALS_DAMBREAK,:), the first dimension of this array contains
-   !< NUMVALS_COMMON common variables (see definitation at top) and NUMEXTVALS_DAMBREAK extra variables here.
-
-   real(kind=dp), dimension(:, :), allocatable, target :: valculvert !< Array for culvert(1:NUMVALS_CULVERT,:), the first dimension of this array contains
-   !< NUMVALS_COMMON common variables (see definitation at top) and above extra variables.
-
-   real(kind=dp), dimension(:, :), allocatable, target :: valuniweir !< Array for universal weir(1:NUMVALS_UNIWEIR,:), the first dimension of this array contains
-   !< NUMVALS_COMMON common variables (see definitation at top) and above extra variables.
-
-   real(kind=dp), dimension(:, :), allocatable, target :: valgategen !< Array for (new) gate (1:NUMVALS_GATEGEN,:), the first dimension of this array contains
-   !< NUMVALS_COMMON_GATE common variables (see definitation at top) and NUMEXTVALS_GATE extra variables.
-
-   real(kind=dp), dimension(:, :), allocatable, target :: valcmpstru !< Array for compound structure(1:NUMVALS_CMPSTRU,:)
-
-   real(kind=dp), dimension(:, :), allocatable, target :: valpump !< Array for pump, (1:NUMVALS_PUMP,:), the first dimension of this array contains
-   !< NUMVALS_COMMON_PUMP common variables (see definitation at top) and NUMEXTVALS_PUMP extra variables.
-
-   real(kind=dp), dimension(:, :), allocatable, target :: vallongculvert !< Array for long culvert, (1:NUMVALS_LONGCULVERT,:), the first dimension of this array contains
-   !< NUMVALS_COMMON common variables (see definitation at top)and above extra variables.
-
-   real(kind=dp), dimension(:, :), allocatable, target :: valgate !< Array for gate;      (1,:) discharge through gate
-   real(kind=dp), dimension(:, :), allocatable, target :: valcdam !< Array for cdam;      (1,:) discharge through controlable dam
-   !<                      (2,:) Upstream average water levels
-   !<                      (3,:) downstream average water level
-   !<                      (4,0) width of dam
-   real(kind=dp), dimension(:, :), allocatable :: valcgen !< Array for general structure (old ext), (1,:) discharge
 
  !! Geometry variables
    ! weir
@@ -137,22 +93,6 @@ module m_structures
    real(kind=dp), allocatable, target :: geomXLongCulv(:) !< [m] x coordinates of long culverts.
    real(kind=dp), allocatable, target :: geomYLongCulv(:) !< [m] y coordinates of long culverts.
 
-   !> Whether or not the model has any structures that lie across multiple partitions
- !! (needed to disable possibly invalid statistical output items)
- !! (set in fill_geometry_arrays_structure)
-   logical, protected :: model_has_weirs_across_partitions = .false.
-   logical, protected :: model_has_general_structures_across_partitions = .false.
-   logical, protected :: model_has_orifices_across_partitions = .false.
-   logical, protected :: model_has_universal_weirs_across_partitions = .false.
-   logical, protected :: model_has_culverts_across_partitions = .false.
-   logical, protected :: model_has_pumps_across_partitions = .false.
-   logical, protected :: model_has_bridges_across_partitions = .false.
-   logical, protected :: model_has_long_culverts_across_partitions = .false.
-   logical, protected :: model_has_dams_across_partitions = .false.
-   logical, protected :: model_has_dambreaks_across_partitions = .false.
-   logical, protected :: model_has_gates_across_partitions = .false.
-   logical, protected :: model_has_compound_structures_across_partitions = .false.
-
    integer, parameter :: IOPENDIR_FROMLEFT = -1 !< Gate door opens/closes from left side.
    integer, parameter :: IOPENDIR_FROMRIGHT = 1 !< Gate door opens/closes from right side.
    integer, parameter :: IOPENDIR_SYMMETRIC = 0 !< Gate door opens/closes symmetrically (from center).
@@ -175,7 +115,6 @@ contains
 
       use m_flowtimes, only: ti_rst
       use m_longculverts_data, only: nlongculverts
-      use m_dambreak_breach, only: n_db_signals
       implicit none
 
       if ((ti_rst > 0 .or. jahispump > 0) .and. npumpsg > 0) then
@@ -324,6 +263,18 @@ contains
       if (allocated(gates)) then
          deallocate (gates)
       end if
+      model_has_weirs_across_partitions = .false.
+      model_has_general_structures_across_partitions = .false.
+      model_has_orifices_across_partitions = .false.
+      model_has_universal_weirs_across_partitions = .false.
+      model_has_culverts_across_partitions = .false.
+      model_has_pumps_across_partitions = .false.
+      model_has_bridges_across_partitions = .false.
+      model_has_long_culverts_across_partitions = .false.
+      model_has_dams_across_partitions = .false.
+      model_has_dambreaks_across_partitions = .false.
+      model_has_gates_across_partitions = .false.
+      model_has_compound_structures_across_partitions = .false.
    end subroutine reset_structures
 
 !> Fills the valstruct array for one given structure on a given link L.
@@ -903,7 +854,6 @@ contains
       use m_GlobalParameters
       use fm_external_forcings_data, only: ncdamsg, ngatesg
       use unstruc_channel_flow, only: network
-      use m_dambreak_breach, only: n_db_signals
 
       integer, intent(in) :: struc_type_id !< The id of the type of the structure (e.g. ST_CULVERT)
       integer :: number_of_structures

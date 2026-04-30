@@ -30,14 +30,12 @@
 !> Module for handling dambreak data in the model
 module m_dambreak_breach
    use precision, only: dp
-   use m_meteo, only: ec_undef_int
+   use m_ec_parameters, only: ec_undef_int
+   use m_structures_indices, only: n_db_links, n_db_signals
 
    implicit none
 
    private
-
-   integer, public, protected :: n_db_links !< number of dambreak links
-   integer, public, protected :: n_db_signals !< number of dambreak signals
 
    type :: t_dambreak !< data for a single dambreak
       integer :: algorithm = 0 !< algorithm for the dambreak breach growth

@@ -59,7 +59,7 @@ module bmi
    use m_flow_finalize_single_timestep, only: flow_finalize_single_timestep
    use m_update_zcgen_widths_and_heights, only: update_zcgen_widths_and_heights
    use m_write_some_final_output, only: write_some_final_output
-   use iso_c_binding
+   use iso_c_binding, only: c_int, c_double, c_char, c_float, c_ptr_iso => c_ptr, c_loc, c_null_char, c_f_pointer, c_bool
    use unstruc_api
    use m_gui ! this should be removed when jaGUI = 0 by default
 
@@ -129,7 +129,7 @@ contains
 !> Fills a string array with the model's input variable names as "long variable names" from the CSDMS Standard Names.
 !! NOTE: not implemented yet, will return a DFM_NOTIMPLEMENTED error.
    function get_input_var_names(names) bind(C, name="get_input_var_names") result(c_istat)
-      type(c_ptr), dimension(:), intent(out) :: names !< Array of C-pointers, will contain pointers to C-compatible strings upon return.
+      type(c_ptr_iso), dimension(:), intent(out) :: names !< Array of C-pointers, will contain pointers to C-compatible strings upon return.
       integer(c_int) :: c_istat !< Integer status code indicating success (zero) or failure (nonzero)
 
       integer :: i_var, var_count
@@ -156,7 +156,7 @@ contains
 !> Returns a string array of the model's output variable names as "long variable names" from the CSDMS Standard Names.
 !! NOTE: not implemented yet, will return a DFM_NOTIMPLEMENTED error.
    subroutine get_output_var_names(names) bind(C, name="get_output_var_names")
-      type(c_ptr), dimension(:), intent(out) :: names !< Array of C-pointers, will contain pointers to C-compatible strings upon return.
+      type(c_ptr_iso), dimension(:), intent(out) :: names !< Array of C-pointers, will contain pointers to C-compatible strings upon return.
       integer(c_int) :: c_istat !< Integer status code indicating success (zero) or failure (nonzero)
 
       integer :: i_var, var_count
@@ -559,7 +559,7 @@ contains
    subroutine dfm_compute_1d2d_coefficients() bind(C, name="dfm_compute_1d2d_coefficients")
       !DEC$ ATTRIBUTES DLLEXPORT :: dfm_compute_1d2d_coefficients
 
-      call compute_1d2d_coefficients()
+      call compute_1d2d_coefficients(s0, s1, hu, u0, ru, au, fu, dts)
 
    end subroutine dfm_compute_1d2d_coefficients
 
@@ -1116,7 +1116,7 @@ contains
       use m_flowgeom
       use network_data
       character(kind=c_char), intent(in) :: c_var_name(*)
-      type(c_ptr), intent(out) :: xptr
+      type(c_ptr_iso), intent(out) :: xptr
 
       integer(c_int), target, allocatable, save :: x(:, :)
 
@@ -1182,7 +1182,7 @@ contains
       use m_get_kbot_ktop
 
       character(kind=c_char), intent(in) :: c_var_name(*) !< Variable name. May be slash separated string "name/item/field": then get_compound_field is called.
-      type(c_ptr), intent(inout) :: x
+      type(c_ptr_iso), intent(inout) :: x
       integer(c_int), target, allocatable, save :: xi(:, :)
       real(c_double), target, allocatable, save :: xd(:, :)
 
@@ -1435,7 +1435,7 @@ contains
       use m_init_openmp, only: init_openmp
 
       character(kind=c_char), intent(in) :: c_var_name(*)
-      type(c_ptr), value, intent(in) :: xptr
+      type(c_ptr_iso), value, intent(in) :: xptr
 
       character(kind=c_char), dimension(:), pointer :: x_0d_char_ptr => null()
       real(c_double), pointer :: x_0d_double_ptr
@@ -1483,7 +1483,7 @@ contains
                if (c_value(i) == c_null_char) exit
                threadsString(i:i) = c_value(i)
             end do
-            read (threadsString, '(I)', iostat=ierr) md_numthreads
+            read (threadsString, '(I10)', iostat=ierr) md_numthreads
             if (ierr == 0) then
                ! Activate the new OpenMP threads setting
                ierr = init_openmp(md_numthreads, jampi)
@@ -1741,7 +1741,7 @@ contains
       integer(c_int), intent(in) :: c_start(*)
       integer(c_int), intent(in) :: c_count(*)
       character(kind=c_char), intent(in) :: c_var_name(*)
-      type(c_ptr), value, intent(in) :: xptr
+      type(c_ptr_iso), value, intent(in) :: xptr
       integer :: i, k, n
 
       real(c_double), pointer :: x_0d_double_ptr
@@ -1902,10 +1902,10 @@ contains
       use m_find_crossed_links_kdtree2
 
       character(kind=c_char), intent(in) :: c_feat_name(*) !< Name/type of the features set, e.g., 'thindams'
-      type(c_ptr), value, intent(in) :: xpli_ptr !< Pointer (by value) to the C-compatible x-coordinates of all features's polyline (one long array).
-      type(c_ptr), value, intent(in) :: ypli_ptr !< Pointer (by value) to the C-compatible y-coordinates of all features's polyline (one long array).
-      type(c_ptr), value, intent(in) :: zpli_ptr !< Pointer (by value) to the C-compatible z-coordinates of all features's polyline (one long array). May be NULL if not relevant.
-      type(c_ptr), value, intent(in) :: npli_ptr !< Pointer (by value) to the C-compatible nr of coordinates of all features's polyline (one long array).
+      type(c_ptr_iso), value, intent(in) :: xpli_ptr !< Pointer (by value) to the C-compatible x-coordinates of all features's polyline (one long array).
+      type(c_ptr_iso), value, intent(in) :: ypli_ptr !< Pointer (by value) to the C-compatible y-coordinates of all features's polyline (one long array).
+      type(c_ptr_iso), value, intent(in) :: zpli_ptr !< Pointer (by value) to the C-compatible z-coordinates of all features's polyline (one long array). May be NULL if not relevant.
+      type(c_ptr_iso), value, intent(in) :: npli_ptr !< Pointer (by value) to the C-compatible nr of coordinates of all features's polyline (one long array).
       integer(c_int), intent(in) :: num_feat !< Number of features passed. npli_ptr should have this length. xpli_ptr etc. should have length sum(npli_ptr(1:numfeat))
       integer(c_int), intent(in) :: keep_existing !< Whether or not (1/0) to keep existing features of the same type.
       integer(c_int) :: iresult !< Result status, DFM_NOERR(=0) if successful.
@@ -2029,7 +2029,7 @@ contains
       character(kind=c_char), intent(in) :: c_var_name(*) !< Name of the set variable, e.g., 'pumps'
       character(kind=c_char), intent(in) :: c_item_name(*) !< Name of a single item's index/location, e.g., 'Pump01'
       character(kind=c_char), intent(in) :: c_field_name(*) !< Name of the field to get, e.g., 'capacity'
-      type(c_ptr), intent(inout) :: x !< Pointer (by reference) to requested value data, NULL if not available.
+      type(c_ptr_iso), intent(inout) :: x !< Pointer (by reference) to requested value data, NULL if not available.
 
       integer :: item_index
       logical :: is_in_network
@@ -2443,7 +2443,7 @@ contains
       implicit none
       character(len=MAXSTRLEN), intent(in) :: item_name
       character(len=MAXSTRLEN), intent(in) :: field_name
-      type(c_ptr) :: c_lateral_pointer
+      type(c_ptr_iso) :: c_lateral_pointer
 
       integer :: item_index, k1, constituent_index
       character(len=MAXSTRLEN) :: constituent_name, direction_string
@@ -2547,11 +2547,11 @@ contains
       character(kind=c_char), intent(in) :: c_var_name(*) !< Name of the set variable, e.g., 'pumps'
       character(kind=c_char), intent(in) :: c_item_name(*) !< Name of a single item's index/location, e.g., 'Pump01'
       character(kind=c_char), intent(in) :: c_field_name(*) !< Name of the field to get, e.g., 'capacity'
-      type(c_ptr), value, intent(in) :: xptr !< Pointer (by value) to the C-compatible value data to be set.
+      type(c_ptr_iso), value, intent(in) :: xptr !< Pointer (by value) to the C-compatible value data to be set.
 
       real(c_double), pointer :: x_0d_double_ptr
       real(c_double), pointer :: x_1d_double_ptr(:)
-      type(c_ptr) :: fieldptr ! c_ptr to the structure's parameter
+      type(c_ptr_iso) :: fieldptr ! c_ptr to the structure's parameter
 
       integer :: item_index
       logical :: is_in_network
@@ -3026,7 +3026,7 @@ contains
       use m_flow
       use network_data
       character(kind=c_char), intent(in) :: c_var_name(*)
-      type(c_ptr), intent(inout) :: x
+      type(c_ptr_iso), intent(inout) :: x
 
       ! The fortran name of the attribute name
       character(len=strlen(c_var_name)) :: var_name
@@ -3047,7 +3047,7 @@ contains
       use m_flow
       use network_data
       character(kind=c_char), intent(in) :: c_var_name(*)
-      type(c_ptr), intent(inout) :: x
+      type(c_ptr_iso), intent(inout) :: x
 
       character(len=strlen(c_var_name)) :: var_name
       var_name = char_array_to_string(c_var_name, strlen(c_var_name))
@@ -3066,7 +3066,7 @@ contains
       use m_flow
       use network_data
       character(kind=c_char), intent(in) :: c_var_name(*)
-      type(c_ptr), intent(inout) :: xptr
+      type(c_ptr_iso), intent(inout) :: xptr
 
       real(c_double), target, allocatable, save :: x(:, :)
 
@@ -3114,7 +3114,7 @@ contains
       real(kind=dp) :: angle
 
       real(c_double), target :: valuet
-      type(c_ptr) :: xptr
+      type(c_ptr_iso) :: xptr
       integer(c_int) :: size1(1)
 
       var_name = char_array_to_string(c_var_name, strlen(c_var_name))
@@ -3185,7 +3185,7 @@ contains
       use m_flow
       use network_data
       character(kind=c_char), intent(in) :: c_var_name(*)
-      type(c_ptr), intent(in) :: x
+      type(c_ptr_iso), intent(in) :: x
 
       ! The fortran name of the attribute name
       character(len=strlen(c_var_name)) :: var_name
@@ -3206,7 +3206,7 @@ contains
       use m_flow
       use network_data
       character(kind=c_char), intent(in) :: c_var_name(*)
-      type(c_ptr), intent(in) :: x
+      type(c_ptr_iso), intent(in) :: x
 
       ! The fortran name of the attribute name
       character(len=strlen(c_var_name)) :: var_name
@@ -3227,7 +3227,7 @@ contains
       use m_flow
       use network_data
       character(kind=c_char), intent(in) :: c_var_name(*)
-      type(c_ptr), intent(in) :: x
+      type(c_ptr_iso), intent(in) :: x
 
       ! The fortran name of the attribute name
       character(len=strlen(c_var_name)) :: var_name
@@ -3248,7 +3248,7 @@ contains
       use m_flow
       use network_data
       character(kind=c_char), intent(in) :: c_var_name(*)
-      type(c_ptr), intent(in) :: x
+      type(c_ptr_iso), intent(in) :: x
 
       ! The fortran name of the attribute name
       character(len=strlen(c_var_name)) :: var_name
@@ -3356,7 +3356,7 @@ contains
       character(kind=c_char), intent(in) :: c_net_file(MAXSTRLEN)
       integer(c_int), intent(out) :: c_numCells
       integer(c_int), intent(out) :: c_maxPerCell
-      type(c_ptr), intent(inout) :: cptr_netElemNode ! return values (ptr to 2d int array)
+      type(c_ptr_iso), intent(inout) :: cptr_netElemNode ! return values (ptr to 2d int array)
 
       integer, pointer :: netElemNode(:)
       character(len=strlen(c_net_file)) :: net_file
@@ -3418,11 +3418,11 @@ contains
 
       character(kind=c_char), intent(in) :: c_feature_type(MAXSTRLEN) !< feature type ('thindam')
       integer(c_int), intent(in) :: c_Nin !< input feature array length
-      type(c_ptr), intent(in) :: cptr_xin, cptr_yin !< input feature coordinates
+      type(c_ptr_iso), intent(in) :: cptr_xin, cptr_yin !< input feature coordinates
 
       integer(c_int), intent(out) :: c_Nout !< output array length
-      type(c_ptr), intent(inout) :: cptr_xout, cptr_yout !< output feature coordinates
-      type(c_ptr), intent(inout) :: cptr_feature_ids !< output feature ids
+      type(c_ptr_iso), intent(inout) :: cptr_xout, cptr_yout !< output feature coordinates
+      type(c_ptr_iso), intent(inout) :: cptr_feature_ids !< output feature ids
 
       integer(c_int), intent(out) :: c_ierror !< ierror (1) or not (0)
 
@@ -3757,9 +3757,9 @@ contains
 
       implicit none
       integer(c_int), intent(in) :: numberOfInputVertices
-      type(c_ptr), intent(in) :: c_xVerticesCoordinates, c_yVerticesCoordinates
+      type(c_ptr_iso), intent(in) :: c_xVerticesCoordinates, c_yVerticesCoordinates
       integer(c_int), intent(out) :: numberOfOutputIndexes
-      type(c_ptr), intent(inout) :: c_indexes
+      type(c_ptr_iso), intent(inout) :: c_indexes
       integer, intent(in) :: startIndex
       !return error code
       integer :: ierr

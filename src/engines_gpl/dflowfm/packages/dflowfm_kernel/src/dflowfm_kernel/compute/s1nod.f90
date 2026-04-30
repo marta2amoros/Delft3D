@@ -47,7 +47,7 @@ contains
       use precision_basics, only: comparereal
       use m_plotdots, only: adddot
       use messagehandling, only: setmessage, level_warn
-      use m_flow, only: a1, bb, nonlin, a1m, dd, s1, vol0, vol1, s1m, s0, nbndz, kbndz, zbndz, zbndz0, u0, epshs, hs, ag, kmx, fu, ru, lbot, ltop, epshu, hu, nbndu, kbndu, jacheckmatrix
+      use m_flow, only: a1, au, bb, nonlin, a1m, dd, s1, vol0, vol1, s1m, s0, nbndz, kbndz, zbndz, zbndz0, u0, epshs, hs, ag, kmx, fu, ru, lbot, ltop, epshu, hu, nbndu, kbndu, jacheckmatrix
       use m_flowgeom, only: ndx, ndx2d, xz, yz, nd, lnx1d, kfs, dx, dxi, bl, ndxi
       use m_flowtimes, only: dti, refdat, time1, alfsmo, dts
       use m_reduce, only: bbr, ddr, ccr, lv2
@@ -277,7 +277,7 @@ contains
       end do
 
       if (nbnd1d2d > 0) then
-         call compute_1d2d_boundaries()
+         call compute_1d2d_boundaries(hu, s0, s1, u0, ru, au, fu, dts)
       end if
 
       jacheckmatrix = 0

@@ -39,16 +39,32 @@ contains
 
    real(kind=dp) function znod(kk) ! get various values at flow nodes
       use precision, only: dp
+      use m_missing, only: DMISS
       use m_getktoplot
-      use m_flow
       use m_flowgeom
       use m_flowtimes ! for volerr
+      use m_flow_link_data, only: a1, a1m, FrcInternalTides2D, hs, numlimdt, plotlin, &
+                                  numoptsf, qin, qw, same, s1, spircrv, spirfx, spirfy, &
+                                  spirint, sqi, squ, tidep, u1, uc1d, ucx, ucy, vol1, &
+                                  volerror, zws
+      use m_flow_vertical_data, only: kmx, kbot, kmxn, kplotordepthaveraged, ktop
       use m_sediment
       use m_fm_erosed, only: ucxq_mor, ucyq_mor
       use m_xbeach_data
       use m_transportdata
       use m_observations_data
-      use m_flowparameters, only: ispirparopt
+      use m_flowparameters, only: cflmx, eps10, flowWithoutWaves, ispirparopt, janudge, &
+                                  jaPure1D, jasal, jasecflow, jatem, &
+                                  jawaveswartdelwaq, nonlin
+      use m_grw, only: jagrw, pgrw, sgrw1
+      use m_physcoef, only: ag, rhomean, Soiltempthick
+      use m_turbulence, only: rho, turkinws, vicwws
+      use m_ship, only: nshiptxy, zsp
+      use m_hydrology_data, only: ActEvap, DFM_HYD_INFILT_CONST, &
+                                  DFM_HYD_INFILT_HORTON, DFM_HYD_INTERCEPT_LAYER, &
+                                  InterceptHs, InterceptThickness, PotEvap, &
+                                  infiltcap, infiltrationmodel, interceptionmodel, jadhyd
+      use m_flowoutput, only: taus
       use m_wind, only: air_pressure_available, air_pressure, rain, relative_humidity, tbed, air_temperature, cloudiness, solar_radiation
       use unstruc_display_data, only: grwhydopt
       use m_drawthis

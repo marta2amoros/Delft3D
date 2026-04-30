@@ -624,7 +624,7 @@ contains
 
       real(kind=dp) :: s1k1
       real(kind=dp) :: s1k2
-      real(kind=dp) :: qp
+      real(kind=dp) :: pump_discharge
       real(kind=dp) :: ap
       real(kind=dp) :: vp1, vp2, vp
       integer :: L
@@ -645,7 +645,7 @@ contains
       vp1 = 0.0_dp
       vp2 = 0.0_dp
       vp = 0.0_dp
-      qp = 0.0_dp
+      pump_discharge = 0.0_dp
       do L0 = 1, struct%numlinks
          L = struct%linknumbers(L0)
          ! Note: Link L may have negative sign if flow link is opposite pump's orientation
@@ -678,10 +678,10 @@ contains
          s1k1 = s1k1 / ap
          s1k2 = s1k2 / ap
          call PrepareComputePump(struct%pump, s1k1, s1k2)
-         qp = struct%pump%discharge ! Already in our local structure spatial orientation.
+         pump_discharge = struct%pump%discharge ! Already in our local structure spatial orientation.
 
          ! Choose available volume on suction side.
-         if (qp > 0.0_dp) then
+         if (pump_discharge > 0.0_dp) then
             vp = vp1
          else
             vp = vp2
@@ -692,7 +692,7 @@ contains
       end if
 
       ! Finally, redistribute the requested pump discharge across all flow links.
-      if (qp == 0.0_dp .or. ap == 0 .or. vp == 0.0_dp) then
+      if (pump_discharge == 0.0_dp .or. ap == 0 .or. vp == 0.0_dp) then
          ! Pump is off
          struct%fu = 0.0_dp
          struct%ru = 0.0_dp
@@ -700,8 +700,8 @@ contains
       else
 
          ! Limit the pump discharge in case the volume in the cells at the suction side is limited.
-         if (abs(qp) > 0.9_dp * vp / dts) then
-            qp = sign(0.9_dp * vp / dts, qp)
+         if (abs(pump_discharge) > 0.9_dp * vp / dts) then
+            pump_discharge = sign(0.9_dp * vp / dts, pump_discharge)
             call setmessage(LEVEL_WARN, 'Discharge through pump ' &
                 & //trim(struct%id)//' is limited below capacity '//&
                 & 'by water volume on suction side.')
@@ -709,7 +709,7 @@ contains
 
          do L0 = 1, struct%numlinks
             L = struct%linknumbers(L0)
-            dir = int(sign(1.0_dp, L * qp)) ! Includes both pumping direction and flow link w.r.t. structure spatial orientation.
+            dir = int(sign(1.0_dp, L * pump_discharge)) ! Includes both pumping direction and flow link w.r.t. structure spatial orientation.
             L = abs(L)
             if (dir > 0) then
                k1 = ln(1, L)
@@ -719,7 +719,7 @@ contains
 
             if (hs(k1) > 1.0e-2_dp) then
                struct%fu(L0) = 0.0_dp
-               struct%ru(L0) = qp / ap
+               struct%ru(L0) = pump_discharge / ap
                struct%au(L0) = ap
             else
                struct%fu(L0) = 0.0_dp

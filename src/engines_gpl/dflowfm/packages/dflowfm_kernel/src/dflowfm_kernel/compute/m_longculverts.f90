@@ -1480,7 +1480,6 @@ contains
    subroutine makelongculverts_commandline(md_1dfiles)
       use m_readstructures
       use string_module, only: strsplit
-      use unstruc_netcdf, only: unc_write_net, UNC_CONV_UGRID
       use system_utils
       use m_set_nod_adm
       use messagehandling, only: IDLEN

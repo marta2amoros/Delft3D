@@ -87,6 +87,7 @@ contains
       use fm_deprecated_keywords, only: default_fm_deprecated_keywords
       use m_sediment, only: deallocgrains, default_sediment
       use m_flow_validatestate, only: default_flow_validatestate
+      use m_dambreak_breach, only: reset_dambreak_counters
 
       implicit none
 
@@ -143,6 +144,7 @@ contains
       call default_modelbounds()
 
       call default_fm_external_forcing_data()
+      call reset_dambreak_counters()
 
       call default_channel_flow()
 

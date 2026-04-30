@@ -26,23 +26,8 @@
 !  Deltares, and remain the property of Stichting Deltares. All rights reserved.
 !
 !-------------------------------------------------------------------------------
-
-!
-!
-module m_get_kbot_ktop
+module fm_external_1d2d_data
    implicit none
-contains
-   elemental subroutine getkbotktop(n, kb, kt)
-      use m_flow_vertical_data, only: kmx, ktop, kbot
-      integer, intent(in) :: n
-      integer, intent(out) :: kb, kt
 
-      if (kmx == 0) then
-         kb = n
-         kt = n
-      else
-         kb = kbot(n)
-         kt = ktop(n)
-      end if
-   end subroutine getkbotktop
-end module m_get_kbot_ktop
+   integer, allocatable, target :: ke1d2d(:) !< temp (numl) edge oriented 1d2d bnd
+end module fm_external_1d2d_data

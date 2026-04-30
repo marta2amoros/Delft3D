@@ -45,6 +45,7 @@ contains
       use m_setzcs, only: setzcs
       use m_getkbotktopmax
       use m_flowtimes, only: handle_extra, irefdate, tunit, tstart_user, tim1fld, ti_mba
+      use m_flow, only: s1
       use m_flowgeom, only: lnx, ndx, xz, yz, xu, yu, iadv, ibot, ndxi, lnx1d, grounlay, jagrounlay, kcs
       use m_netw, only: xk, yk, zk, numk, numl
       use unstruc_model, only: md_extfile_dir, md_inifieldfile, md_extfile, md_ptr
@@ -1505,7 +1506,7 @@ contains
 
       ! initialise water level of 1d2d boundary points
       if (nbnd1d2d > 0) then
-         call init_1d2d_boundary_points()
+         call init_1d2d_boundary_points(s1)
       end if
 
       if (jaoldstr > 0) then

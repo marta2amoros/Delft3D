@@ -36,7 +36,8 @@ contains
       !FB TODO: this should be a function not a subroutine, return value (k) is not the last argument in list. booleans should be logical not integer.
       use precision, only: dp
       use m_flowgeom, only: ndxi, ndx2d, nd, xz, yz, dx
-      use m_flow, only: jins, dmiss, nbndz, kbndz
+      use m_missing, only: jins, dmiss
+      use fm_external_boundary_data, only: nbndz, kbndz
       use m_GlobalParameters, only: INDTP_1D, INDTP_2D, INDTP_ALL
       use geometry_module, only: pinpok
 

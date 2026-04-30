@@ -1,6 +1,7 @@
 # Define the library
 set(library_name waq_definition)
 
+
 create_target(${library_name} ${CMAKE_CURRENT_SOURCE_DIR} src_dir .)
 
 # Set additional compilation properties

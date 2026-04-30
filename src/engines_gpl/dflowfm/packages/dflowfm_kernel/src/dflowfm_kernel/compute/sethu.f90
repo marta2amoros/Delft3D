@@ -232,7 +232,7 @@ contains
       end if
 
       if (nbnd1d2d > 0) then ! 1d2d boundary check for closed boundaries
-         call sethu_1d2d()
+         call sethu_1d2d(s0, hu)
       end if
 
       if (javeg > 0) then

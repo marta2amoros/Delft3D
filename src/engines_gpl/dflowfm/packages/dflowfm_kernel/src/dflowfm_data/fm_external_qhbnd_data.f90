@@ -26,23 +26,21 @@
 !  Deltares, and remain the property of Stichting Deltares. All rights reserved.
 !
 !-------------------------------------------------------------------------------
+module fm_external_qhbnd_data
+   use precision, only: dp
 
-!
-!
-module m_get_kbot_ktop
    implicit none
-contains
-   elemental subroutine getkbotktop(n, kb, kt)
-      use m_flow_vertical_data, only: kmx, ktop, kbot
-      integer, intent(in) :: n
-      integer, intent(out) :: kb, kt
 
-      if (kmx == 0) then
-         kb = n
-         kt = n
-      else
-         kb = kbot(n)
-         kt = ktop(n)
-      end if
-   end subroutine getkbotktop
-end module m_get_kbot_ktop
+   integer, allocatable :: kbndu(:, :) !< velocity boundary points index array
+   integer, allocatable :: L1qbnd(:) !< first nbndu point in discharge bnd nqbnd
+   integer, allocatable :: L2qbnd(:) !< second nbndu point in discharge bnd nqbnd
+   real(kind=dp), allocatable :: at_all(:) !< "at" for all qbnd's, dim(nqbnd)
+   real(kind=dp), allocatable :: at_sum(:) !< "at" for all qbnd's, summed over all domains
+   real(kind=dp), allocatable :: wwssav_all(:, :) !< "wwav" and "ssav" for all qbd's
+   real(kind=dp), allocatable :: wwssav_sum(:, :) !< summed "wwav" and "ssav" for all qbd's
+   integer :: japartqbnd !< one or more discharge boundaries is partitioned
+   integer :: nqbnd !< number of discharge boundaries
+   integer :: nqhbnd !< number of qh boundaries
+   real(kind=dp), allocatable, target :: atqh_all(:) !< qh discharge per domain
+   real(kind=dp), allocatable :: atqh_sum(:) !< total qh discharge
+end module fm_external_qhbnd_data

@@ -76,7 +76,7 @@ contains
       real(kind=dp) :: fsqrtt, uorbL
 
       integer :: np, L1 ! pumpstuff
-      real(kind=dp) :: ap, qp, vp ! pumpstuff
+      real(kind=dp) :: ap, pump_discharge, vp ! pumpstuff
 
       real(kind=dp) :: cfuhi3D ! for bed friction
 
@@ -221,7 +221,7 @@ contains
 
          if (npump > 0) then ! model has at least one pump link
             do np = 1, npumpsg ! loop over pump signals, sethu
-               qp = qpump(np)
+               pump_discharge = qpump(np)
                ap = 0.0_dp
                vp = 0.0_dp
                do n = L1pumpsg(np), L2pumpsg(np)
@@ -233,7 +233,7 @@ contains
                   au(L) = 0.0_dp
                   fu(L) = 0.0_dp
                   ru(L) = 0.0_dp
-                  if (qp * L1 >= 0) then
+                  if (pump_discharge * L1 >= 0) then
                      kup = k1
                      kdo = k2
                      iup = 1
@@ -252,8 +252,8 @@ contains
                      vp = vp + vol1(k1)
                   end if
                end do
-               if (qp > 0.5_dp * vp / dts) then
-                  qp = 0.5_dp * vp / dts
+               if (pump_discharge > 0.5_dp * vp / dts) then
+                  pump_discharge = 0.5_dp * vp / dts
                end if
 
                if (ap > 0.0_dp) then
@@ -262,9 +262,9 @@ contains
                      L = abs(L1)
                      if (au(L) > 0.0_dp) then
                         if (L1 > 0) then
-                           ru(L) = qp / ap
+                           ru(L) = pump_discharge / ap
                         else
-                           ru(L) = -qp / ap
+                           ru(L) = -pump_discharge / ap
                         end if
                      end if
                   end do

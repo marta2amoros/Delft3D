@@ -42,7 +42,7 @@ contains
 
    subroutine widarhyr(hpr, dz, wu2, wid, ar, hyr)
       use precision, only: dp
-      use m_flow, only: slotw2D
+      use m_flowparameters, only: slotw2D
       implicit none
       real(kind=dp) :: hpr, dz, wu2, wid, ar, hyr
       real(kind=dp) :: per, hp2

@@ -1,4 +1,5 @@
 set(library_name trachytopes_kernel)
+
 create_target(${library_name} ${CMAKE_CURRENT_SOURCE_DIR} src_dir src)
 
 # Add dependencies

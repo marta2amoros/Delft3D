@@ -41,10 +41,15 @@ contains
    real(kind=dp) function zlin(LL) ! get various values at flow links
       use precision, only: dp
       use m_getltoplot
-      use m_flow
       use m_flowgeom
+      use m_flow_link_data, only: a1, adve, advi, au, cfuhi, frcu, frculin, fu, hs, hu, ifrcutp, plotlin, q1, qw, ru, s1, suu, &
+                                  u0, u1, ustb, ustw, v, vicLu, wavfu, wdsu_x, zws
+      use m_flow_vertical_data, only: kmx, kbot, Lbot, Ltop, kmxL, ltop
+      use m_flowparameters, only: epshu, jaconveyance2D, jafrculin, jamapwindstress, jawave
       use m_wind
       use m_sediment
+      use m_turbulence, only: turkin0, tureps0, vicwwu
+      use m_vegetation, only: diaveg, javeg, rnveg, stemheight
       use m_sferic
       use m_missing
       use m_drawthis

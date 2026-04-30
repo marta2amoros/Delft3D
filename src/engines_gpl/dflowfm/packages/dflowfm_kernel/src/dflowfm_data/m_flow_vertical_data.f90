@@ -26,23 +26,20 @@
 !  Deltares, and remain the property of Stichting Deltares. All rights reserved.
 !
 !-------------------------------------------------------------------------------
-
-!
-!
-module m_get_kbot_ktop
+module m_flow_vertical_data
    implicit none
-contains
-   elemental subroutine getkbotktop(n, kb, kt)
-      use m_flow_vertical_data, only: kmx, ktop, kbot
-      integer, intent(in) :: n
-      integer, intent(out) :: kb, kt
 
-      if (kmx == 0) then
-         kb = n
-         kt = n
-      else
-         kb = kbot(n)
-         kt = ktop(n)
-      end if
-   end subroutine getkbotktop
-end module m_get_kbot_ktop
+   integer :: kmx !< nr of 3d layers, increasing in positive upward direction
+   integer :: ndkx !< dim of 3d flow nodes (internal + boundary)
+   integer :: lnkx !< dim of 3d flow links (internal + boundary)
+   integer :: kplot !< layer nr to be plotted
+   integer :: nplot !< vertical profile to be plotted at node nr
+   integer :: kplotordepthaveraged = 1 !< 1 = kplot, 2 = averaged
+   integer :: kplotfrombedorsurface = 2 !< up or down k
+   integer, allocatable, target :: ktop(:) !< [-] layer-compressed top layer cell number
+   integer, allocatable, target :: kbot(:) !< [-] layer-compressed bottom layer cell number
+   integer, allocatable :: kmxn(:) !< Maximum number of active vertical cells per horizontal base cell n
+   integer, allocatable, target :: Ltop(:) !< [-] layer-compressed top layer edge number
+   integer, allocatable, target :: Lbot(:) !< [-] layer-compressed bottom layer edge number
+   integer, allocatable :: kmxL(:) !< max nr of vertical links per base link L
+end module m_flow_vertical_data

@@ -26,11 +26,55 @@ set_source_files_properties(${fortran_version_files}
 set(dflowfm_data_path ${src_path}/dflowfm_data)
 get_fortran_source_files(${dflowfm_data_path} dflowfm_data)
 
+# Separate fm_external_forcings_data and its dependencies to resolve compilation order
+# First, the dependency modules that fm_external_forcings_data depends on
+set(dflowfm_data_forcings_deps 
+    ${dflowfm_data_path}/fm_external_1d2d_data.f90
+    ${dflowfm_data_path}/fm_external_qhbnd_data.f90
+    ${dflowfm_data_path}/fm_external_boundary_data.f90)
+
+# Then fm_external_forcings_data itself
+set(dflowfm_data_forcings_module ${dflowfm_data_path}/fm_external_forcings_data.f90)
+
+# Files that depend on fm_external_forcings_data
+# Separate unstruc_structures.f90 to ensure it compiles before unstruc_model.f90
+# since unstruc_model.f90 depends on the m_structures module defined in unstruc_structures.f90
+set(dflowfm_data_structures_module ${dflowfm_data_path}/unstruc_structures.f90)
+
+set(dflowfm_data_forcings_dependents
+    ${dflowfm_data_path}/m_flow.f90
+    ${dflowfm_data_path}/m_initialize_flow1d_implicit.f90
+    ${dflowfm_data_path}/unstruc_inifields.f90
+    ${dflowfm_data_path}/partition.F90)
+
+# Files that depend on unstruc_structures.f90
+set(dflowfm_data_structures_dependents
+    ${dflowfm_data_path}/unstruc_model.f90
+    ${dflowfm_data_path}/fm_statistical_output.f90)
+
+# Remove separated files from the main dflowfm_data list
+list(REMOVE_ITEM dflowfm_data 
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/fm_external_1d2d_data.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/fm_external_qhbnd_data.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/fm_external_boundary_data.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/fm_external_forcings_data.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/m_flow.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/m_initialize_flow1d_implicit.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/unstruc_inifields.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/unstruc_model.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/partition.F90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/unstruc_structures.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_path}/fm_statistical_output.f90
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_structures_module}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_data_structures_dependents})
+
 set(dflowfm_gui_path ${src_path}/dflowfm_gui)
 get_fortran_source_files(${dflowfm_gui_path} dflowfm_gui)
 
 set(dflowfm_io_path ${src_path}/dflowfm_io)
 get_fortran_source_files(${dflowfm_io_path} dflowfm_io)
+set(dflowfm_io_netcdf_module ${dflowfm_io_path}/unstruc_netcdf.f90)
+list(REMOVE_ITEM dflowfm_io ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_io_path}/unstruc_netcdf.f90)
 
 set(dflowfm_kernel_path ${src_path}/dflowfm_kernel)
 set(dflowfm_kernel_compute_path ${dflowfm_kernel_path}/compute)
@@ -50,6 +94,10 @@ set(dflowfm_kernel_timespace_path ${dflowfm_kernel_path}/timespace)
 
 get_fortran_source_files(${dflowfm_kernel_path} dflowfm_kernel)
 get_fortran_source_files(${dflowfm_kernel_compute_path} dflowfm_kernel_compute)
+
+# Separate m_density_parameters to resolve dependency order
+set(dflowfm_kernel_compute_density ${dflowfm_kernel_compute_path}/m_density_parameters.f90)
+list(REMOVE_ITEM dflowfm_kernel_compute ${CMAKE_CURRENT_SOURCE_DIR}/${dflowfm_kernel_compute_path}/m_density_parameters.f90)
 get_fortran_source_files(${dflowfm_kernel_compute_hydrology_path} dflowfm_kernel_compute_hydrology)
 get_fortran_source_files(${dflowfm_kernel_compute_sediment_path} dflowfm_kernel_compute_sediment)
 get_fortran_source_files(${dflowfm_kernel_compute_sediment_netnode_based_path} dflowfm_kernel_compute_sediment_netnode_based)
@@ -86,6 +134,13 @@ get_fortran_source_files(${src_path}/to_thirdparty to_thirdparty)
 set(library_name dflowfm_kernel)
 set(library_source_list     ${fortran_version_files}
                             ${headers}
+                            ${dflowfm_kernel_compute_density}
+                            ${dflowfm_data_forcings_deps}
+                            ${dflowfm_data_forcings_module}
+                            ${dflowfm_io_netcdf_module}
+                            ${dflowfm_data_forcings_dependents}
+                            ${dflowfm_data_structures_module}
+                            ${dflowfm_data_structures_dependents}
                             ${dflowfm_data}
                             ${dflowfm_gui}
                             ${dflowfm_io}
@@ -163,13 +218,15 @@ target_link_libraries(${library_name} PRIVATE
 if (UNIX)
     # the `pkg_check_modules` function is created with this call
     find_package(PkgConfig REQUIRED)
-    pkg_check_modules(PETSC REQUIRED IMPORTED_TARGET PETSc)
+    pkg_check_modules(PETSC IMPORTED_TARGET PETSc)
 
     target_link_libraries(${library_name} PRIVATE
                           interacter_stub
-                          PkgConfig::PETSC
                           uuid
     )
+    if(PETSC_FOUND)
+        target_link_libraries(${library_name} PRIVATE PkgConfig::PETSC)
+    endif()
 endif(UNIX)
 
 if (WIN32)

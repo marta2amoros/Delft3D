@@ -1,6 +1,7 @@
 # Set include path
 set(deltares_common_include_path ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+
 # Set version file variables
 set(fortran_version_file "${CMAKE_CURRENT_SOURCE_DIR}/src/deltares_common_version.F90")
 set(version_include_dir ${CMAKE_SOURCE_DIR}/../version_includes)
@@ -22,6 +23,8 @@ set(stdlib_source src/stdlib/stdlib_kinds.f90
 get_fortran_source_files(src source)
 
 set(library_name deltares_common)
+
+
 add_library(${library_name} ${source}
                             ${rd_token_source}
                             ${stdlib_source}

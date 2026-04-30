@@ -127,7 +127,7 @@ contains
       use MessageHandling, only: err, mess, LEVEL_WARN, LEVEL_ERROR
       use m_ug_nc_attribute, only: ug_nc_attribute
       use unstruc_channel_flow, only: network
-      use m_dambreak_breach, only: n_db_links, n_db_signals
+      use m_structures_indices, only: n_db_links, n_db_signals
 
       implicit none
 

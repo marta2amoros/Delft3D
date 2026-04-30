@@ -38,7 +38,7 @@ module m_get_lkbot_set_ltop_upwind
 contains
 
    subroutine get_lkbot_set_ltop_upwind(link, upstream_cell, upstream_cell_index, Lb, kb, kt)
-      use m_flow, only: Lbot, ktop, Ltop
+      use m_flow_vertical_data, only: Lbot, ktop, Ltop
       use m_turbulence, only: ln0
 
       implicit none

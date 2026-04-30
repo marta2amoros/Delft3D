@@ -1127,9 +1127,9 @@ contains
       use m_1d_structures, only: addstructure, getstructype_from_string
       use m_hash_search, only: hashsearch
       use m_readstructures, only: readdambreak
-      use m_structures, only: tree_data, strs_ptr, idlen
-      use messagehandling, only: msgbuf, msg_flush, err_flush
-      use properties, only: prop_get
+      use m_structures_indices, only: strs_ptr
+      use messagehandling, only: msgbuf, msg_flush, err_flush, IdLen
+      use properties, only: prop_get, tree_data
       use unstruc_channel_flow, only: network
 
       integer, intent(in) :: index_structure !< the index of the structure in the structure list.

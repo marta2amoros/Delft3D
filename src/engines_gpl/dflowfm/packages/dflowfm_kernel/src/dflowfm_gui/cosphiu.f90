@@ -40,7 +40,7 @@ contains
       use precision, only: dp
 
       use m_flowgeom
-      use m_netw, only: xk, yk
+      use network_data, only: xk, yk
       use geometry_module, only: normalin
       use m_missing, only: dxymis
       use m_sferic, only: jsferic, jasfer3D

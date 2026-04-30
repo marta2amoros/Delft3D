@@ -2055,7 +2055,7 @@ contains
 !>    it is assumed that 3d layer information (kmxn, kmxL) is available
    subroutine partition_make_ghostsendlists_3d(ierror)
       use m_flowgeom, only: Ndx, Lnx
-      use m_flow, only: kmx, kmxn, kmxL
+      use m_flow_vertical_data, only: kmx, kmxn, kmxL
       implicit none
 
       integer, intent(out) :: ierror
@@ -2238,7 +2238,7 @@ contains
       use m_flowgeom, only: dp, ndx, lnx
       use messagehandling, only: mess, level_error
 #endif
-      use m_flow, only: kmxn, kmxL, kbot, Lbot, Ndkx, Lnkx
+      use m_flow_vertical_data, only: kmxn, kmxL, kbot, Lbot, Ndkx, Lnkx
       use network_data, only: numk
 
       implicit none
@@ -3197,7 +3197,7 @@ contains
 
 !> sum at_all for q-boundaries
    subroutine reduce_at_all()
-      use fm_external_forcings_data
+      use fm_external_qhbnd_data, only: at_all, at_sum, nqbnd
 #ifdef HAVE_MPI
       use mpi
 #endif
@@ -3215,7 +3215,7 @@ contains
 
 !> sum wwssav_all for q-boundaries
    subroutine reduce_wwssav_all()
-      use fm_external_forcings_data
+      use fm_external_qhbnd_data, only: wwssav_all, wwssav_sum, nqbnd
 #ifdef HAVE_MPI
       use mpi
 #endif
@@ -3233,7 +3233,7 @@ contains
 
 !> sum atqh_all for qh-boundaries
    subroutine reduce_atqh_all()
-      use fm_external_forcings_data
+      use fm_external_qhbnd_data, only: atqh_all, atqh_sum, nqhbnd
 #ifdef HAVE_MPI
       use mpi
 #endif
@@ -5378,7 +5378,9 @@ contains
 
 !> set idomain values for all open boundary cells
    subroutine set_idomain_for_all_open_boundaries()
-      use fm_external_forcings_data, only: nbndz, kez, nbndu, keu, ke1d2d
+      use fm_external_boundary_data, only: nbndz, kbndz
+      use fm_external_qhbnd_data, only: kbndu
+      use fm_external_1d2d_data, only: ke1d2d
       use m_sobekdfm, only: nbnd1d2d
       use m_cell_geometry, only: ndx
       use m_alloc, only: realloc
@@ -5386,9 +5388,15 @@ contains
       if (size(idomain) < ndx) then
          call realloc(idomain, ndx, keepExisting=.true.)
       end if
-      call set_idomain_for_open_boundary_points(nbndz, size(kez), kez, ndx, idomain)
-      call set_idomain_for_open_boundary_points(nbndu, size(keu), keu, ndx, idomain)
-      call set_idomain_for_open_boundary_points(nbnd1d2d, size(ke1d2d), ke1d2d, ndx, idomain)
+      if (allocated(kbndz) .and. nbndz > 0) then
+         call set_idomain_for_open_boundary_points(nbndz, size(kbndz, 2), kbndz(3, :), ndx, idomain)
+      end if
+      if (allocated(kbndu) .and. size(kbndu, 2) > 0) then
+         call set_idomain_for_open_boundary_points(size(kbndu, 2), size(kbndu, 2), kbndu(3, :), ndx, idomain)
+      end if
+      if (allocated(ke1d2d) .and. nbnd1d2d > 0) then
+         call set_idomain_for_open_boundary_points(nbnd1d2d, size(ke1d2d), ke1d2d, ndx, idomain)
+      end if
 
    end subroutine set_idomain_for_all_open_boundaries
 
@@ -5724,7 +5732,7 @@ contains
 
 !> see if a discharge boundary is partitioned and set japartqbnd
    subroutine set_japartqbnd()
-      use fm_external_forcings_data
+      use fm_external_qhbnd_data, only: japartqbnd, nqbnd, L1qbnd, L2qbnd, kbndu
 #ifdef HAVE_MPI
       use mpi
 #endif

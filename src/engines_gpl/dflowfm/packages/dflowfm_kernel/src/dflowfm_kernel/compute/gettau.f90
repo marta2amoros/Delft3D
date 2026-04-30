@@ -58,7 +58,10 @@ contains
    subroutine gettau2(n, taucurc, czc, ustw2, jawaveswartdelwaq_par)
       use precision, only: dp
       use m_flowgeom, only: nd, dx, wave_waq_shear_stress_hyd, wave_waq_shear_stress_linear_sum, wave_waq_shear_stress_max_shear_stress
-      use m_flow, only: frcu, hu, u1, v, ifrcutp, ag, au, ustb, taubxu, z0ucur, epsz0, kmx, ucx, ucy, rhomean
+      use m_flow_link_data, only: frcu, hu, u1, v, ifrcutp, au, ustb, taubxu, z0ucur, ucx, ucy
+      use m_flow_vertical_data, only: kmx
+      use m_flowparameters, only: epsz0
+      use m_physcoef, only: ag, rhomean
       use m_waves, only: twav, uorb, ftauw
       use m_get_chezy, only: get_chezy
       !

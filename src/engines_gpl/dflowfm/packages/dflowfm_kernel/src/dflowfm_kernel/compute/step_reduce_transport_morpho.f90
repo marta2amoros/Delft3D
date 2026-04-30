@@ -96,7 +96,7 @@ contains
 
       if (flow_solver == FLOW_SOLVER_FM) then
          call u1q1() ! the vertical flux qw depends on new sigma => after set_kbot_ktop
-         call compute_q_total_1d2d()
+         call compute_q_total_1d2d(au, u1, s1)
       end if
 
       !if ( jacheckmonitor.eq.1 ) then

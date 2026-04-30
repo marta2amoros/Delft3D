@@ -60,6 +60,9 @@ module unstruc_netcdf
    use m_waveconst
    use m_get_Lbot_Ltop_max, only: getLbotLtopmax
    use m_reconstruct_hydrodynamics, only: reconstruct_hu_2D_from_3D
+   use m_structures_indices, only: UNC_CONV_CFOLD, UNC_CONV_UGRID, unc_cmode, unc_meta_md_ident, &
+                                   unc_meta_net_file, unc_metadatafile, unc_nccompress, &
+                                   unc_noforcedflush, unc_nounlimited, unc_uuidgen, unc_writeopts
 
    implicit none
 
@@ -82,25 +85,11 @@ module unstruc_netcdf
               open_files_, open_datasets_, nopen_files_, unc_read_merged_map, t_unc_merged, &
               read_mesh2d_face_z, face_z_stdname
 
-   integer, parameter :: UNC_CONV_CFOLD = 1 !< Old CF-only conventions.
-   integer, parameter :: UNC_CONV_UGRID = 2 !< New CF+UGRID conventions.
-
-   integer :: unc_cmode = 0 !< Default NetCDF creation mode flag value, used in nf90_create calls (e.g., NF90_NETCDF4).
-   logical :: unc_nccompress !< Whether or not to apply compression to NetCDF output files - NOTE: only works when NcFormat = 4
-   integer :: unc_nounlimited !< NetCDF output with time dimension set to full length of simulation, avoids "unlimited dimension" overhead. Often requires md_ncformat=4/unc_cmode=NF90_NETCDF4.
-   integer :: unc_noforcedflush !< Do not force NetCDF file flushing every output timestep (map-like files).
-   integer :: unc_writeopts !< Default write options (currently only: UG_WRITE_LATLON)
-   integer :: unc_uuidgen !< Generate UUID and store into each newly created NetCDF file.
-
 ! The following location codes generalize for 1D/2D/3D models. See function unc_def_var_map for the details.
 
    integer, parameter :: MAX_ID_VAR = 4 !< Maximum dimension for id_var arrays
 
    type(t_ug_meta) :: ug_meta_fm !< Meta information on file.
-   character(len=255) :: unc_metadatafile !< Input metadata NetCDF file to be included into other NetCDF output files, (e.g., *_meta.nc)
-   character(len=64) :: unc_meta_md_ident !< Identifier of the model, provided via unstruc_model, to be used in pattern substitution of attribute values.
-   character(len=64) :: unc_meta_net_file !< Filename of input net/grid file, provided via unstruc_model, to be used in pattern substitution of attribute values.
-
 !> List of attribute names that are forbidden to be set via a custom metadata file by the user.
    character(len=32), dimension(19), parameter :: unc_meta_forbidden_atts = [character(len=32) :: &
                                                                              'references', &

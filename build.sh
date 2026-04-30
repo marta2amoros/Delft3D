@@ -78,8 +78,20 @@ function DoCMake () {
     echo
     echo "Executing CMake for $1 ..."
     cd    $root/build_$1$2
-    echo "cmake ../src/cmake -G "$generator" -B "." -D CONFIGURATION_TYPE="$1" -D CMAKE_BUILD_TYPE=${buildtype}"
-          cmake ../src/cmake -G "$generator" -B "." -D CONFIGURATION_TYPE="$1" -D CMAKE_BUILD_TYPE=${buildtype} -D CMAKE_INSTALL_PREFIX=../build_$1$2/install/ -DCMAKE_Fortran_FLAGS="-ffree-line-length-none -std=legacy -fallow-argument-mismatch -Wno-error=c-binding-type"
+    local cmake_compiler_args=()
+    if [ ! -z "${CC:-}" ]; then
+        cmake_compiler_args+=("-D" "CMAKE_C_COMPILER=${CC}")
+    fi
+    if [ ! -z "${CXX:-}" ]; then
+        cmake_compiler_args+=("-D" "CMAKE_CXX_COMPILER=${CXX}")
+    fi
+    if [ ! -z "${FC:-}" ]; then
+        cmake_compiler_args+=("-D" "CMAKE_Fortran_COMPILER=${FC}")
+    fi
+
+    echo "Using toolchain: CC=${CC:-unset} CXX=${CXX:-unset} FC=${FC:-unset}"
+    echo "cmake ../src/cmake -G "$generator" -B "." -D CONFIGURATION_TYPE="$1" -D CMAKE_BUILD_TYPE=${buildtype} ${cmake_compiler_args[*]}"
+          cmake ../src/cmake -G "$generator" -B "." -D CONFIGURATION_TYPE="$1" -D CMAKE_BUILD_TYPE=${buildtype} -D CMAKE_INSTALL_PREFIX=../build_$1$2/install/ -DCMAKE_Fortran_FLAGS="-ffree-line-length-none -std=legacy -fallow-argument-mismatch -Wno-error=c-binding-type" "${cmake_compiler_args[@]}"
     if [ $? -ne 0 ]; then
         echo "CMake configure resulted in an error. Check log files."
         exit 1

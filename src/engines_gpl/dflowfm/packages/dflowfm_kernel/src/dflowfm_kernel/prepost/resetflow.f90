@@ -66,6 +66,7 @@ contains
       use m_nearfield, only: reset_nearfieldData
       use m_laterals, only: reset_lateral
       use m_flow_validatestate, only: reset_flow_validatestate
+      use m_dambreak_breach, only: reset_dambreak_counters
 
       implicit none
 
@@ -89,6 +90,7 @@ contains
       call reset_modelbounds()
 
       call reset_flowexternalforcings()
+      call reset_dambreak_counters()
 
       call reset_longculverts()
 

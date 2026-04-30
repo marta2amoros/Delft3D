@@ -184,11 +184,13 @@ contains
    end subroutine set_1d2d_01
 
    !> Set flooding thresholds for 1d2d interfaces/boundaries
-   subroutine sethu_1d2d()
+   subroutine sethu_1d2d(s0, hu)
       use precision, only: dp
 
       use m_flowgeom, only: bob
-      use m_flow, only: s0, hu
+
+      real(kind=dp), intent(in) :: s0(:)
+      real(kind=dp), intent(inout) :: hu(:)
 
       integer :: ibnd
       integer :: k2
@@ -219,7 +221,7 @@ contains
    subroutine init_1d2d()
       use m_flowgeom, only: lne2ln, ln, xyen, nd, teta, iadv
       use m_flowparameters, only: iadvec
-      use fm_external_forcings_data, only: ke1d2d
+      use fm_external_1d2d_data, only: ke1d2d
       use network_data, only: xe, ye
       use m_GlobalParameters, only: pi
 
@@ -271,9 +273,9 @@ contains
 
    end subroutine init_1d2d
 
-   subroutine init_1d2d_boundary_points()
+   subroutine init_1d2d_boundary_points(s1)
 
-      use m_flow, only: s1
+      real(kind=dp), intent(inout) :: s1(:)
 
       integer :: kb, k2, k
 
@@ -289,8 +291,11 @@ contains
    end subroutine init_1d2d_boundary_points
 
    !> calculates new s1 values for virtual (ghost) 1d2d boundary points
-   subroutine compute_q_total_1d2d()
-      use m_flow, only: au, u1, s1
+   subroutine compute_q_total_1d2d(au, u1, s1)
+
+      real(kind=dp), intent(in) :: au(:)
+      real(kind=dp), intent(in) :: u1(:)
+      real(kind=dp), intent(in) :: s1(:)
 
       integer :: ibnd
       integer :: L
@@ -303,19 +308,27 @@ contains
 
    end subroutine compute_q_total_1d2d
 !
-   subroutine compute_1d2d_boundaries()
+   subroutine compute_1d2d_boundaries(hu, s0, s1, u0, ru, au, fu, dts)
 
       use m_reduce, only: bbr, ccr, lv2, ddr
-      use m_flow, only: hu
 
       implicit none
+
+      real(kind=dp), intent(in) :: hu(:)
+      real(kind=dp), intent(in) :: s0(:)
+      real(kind=dp), intent(in) :: s1(:)
+      real(kind=dp), intent(inout) :: u0(:)
+      real(kind=dp), intent(inout) :: ru(:)
+      real(kind=dp), intent(in) :: au(:)
+      real(kind=dp), intent(in) :: fu(:)
+      real(kind=dp), intent(in) :: dts
 
       integer :: kb, L
       integer :: ibnd
 
       ! Program code
 
-      call compute_1d2d_coefficients()
+      call compute_1d2d_coefficients(s0, s1, hu, u0, ru, au, fu, dts)
 
       do ibnd = 1, nbnd1d2d
          kb = kbnd1d2d(1, ibnd)
@@ -330,15 +343,22 @@ contains
    end subroutine compute_1d2d_boundaries
 
 !
-   subroutine compute_1d2d_coefficients()
+   subroutine compute_1d2d_coefficients(s0, s1, hu, u0, ru, au, fu, dts)
       use precision, only: dp
 
       use m_flowgeom, only: bob, wu, dx, teta
-      use m_flow, only: s0, s1, hu, u0, ru, au, fu
-      use m_flowtimes, only: dts
       use m_GlobalParameters, only: gravity
 
       implicit none
+
+      real(kind=dp), intent(in) :: s0(:)
+      real(kind=dp), intent(in) :: s1(:)
+      real(kind=dp), intent(in) :: hu(:)
+      real(kind=dp), intent(inout) :: u0(:)
+      real(kind=dp), intent(inout) :: ru(:)
+      real(kind=dp), intent(in) :: au(:)
+      real(kind=dp), intent(in) :: fu(:)
+      real(kind=dp), intent(in) :: dts
 
       integer :: kb, k2, L
       integer :: ibnd

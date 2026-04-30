@@ -570,7 +570,7 @@ function ionc_get_var_1D_EightByteReal_dll(ioncid, meshid, iloctype, c_varname, 
 end function ionc_get_var_1D_EightByteReal_dll
 
 !> Gets the charater values for a named variable in the specified dataset on the specified mesh.
-function ionc_get_var_chars_dll(ioncid, meshid, c_varname, c_values_ptr, nval) result(ierr) bind(C, name="ionc_get_var_chars")
+function ionc_get_var_chars_dll(ioncid, meshid, c_varname, c_values_ptr, nval) result(ierr)
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_get_var_chars_dll
    integer,                intent(in)    :: ioncid                  !< The IONC data set id.
    integer,                intent(in)    :: meshid                  !< The mesh id in the specified data set.
@@ -620,7 +620,7 @@ function ionc_put_var_1D_EightByteReal_dll(ioncid, meshid, iloctype, c_varname, 
 end function ionc_put_var_1D_EightByteReal_dll
 
 !> Puts the charaters values for a named variable into the specified dataset on the specified mesh.
-function ionc_put_var_chars_dll(ioncid, meshid, c_varname, c_values_ptr, nval) result(ierr) bind(C, name="ionc_put_var_chars")
+function ionc_put_var_chars_dll(ioncid, meshid, c_varname, c_values_ptr, nval) result(ierr)
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_put_var_chars_dll
 
    integer,                intent(in)    :: ioncid                  !< The IONC data set id.
@@ -674,7 +674,7 @@ function ionc_add_global_attributes_dll(ioncid, c_meta_ptr) result(ierr) bind(C,
    call c_f_pointer(c_meta_ptr, meta)
 
    ! Now call the internal Fortran routine using the dereferenced pointer
-   ierr = ionc_add_global_attributes(ioncid, meta)
+   ierr = ionc_add_global_attributes(ioncid, meta%institution, meta%source, meta%references, meta%version, meta%modelname)
 
 end function ionc_add_global_attributes_dll
 
@@ -750,7 +750,7 @@ function ionc_create_1d_network_dll(ioncid, networkid, c_networkName, nNodes, nB
 
 end function ionc_create_1d_network_dll
 
-function ionc_write_1d_network_nodes_dll(ioncid,networkid, c_nodesX, c_nodesY, nodeinfo, nNodes) result(ierr) bind(C, name="ionc_write_1d_network_nodes")
+function ionc_write_1d_network_nodes_dll(ioncid,networkid, c_nodesX, c_nodesY, nodeinfo, nNodes) result(ierr)
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_write_1d_network_nodes_dll
 
    integer(kind=c_int),     intent(in)    :: ioncid,networkid, nNodes
@@ -772,7 +772,7 @@ function ionc_write_1d_network_nodes_dll(ioncid,networkid, c_nodesX, c_nodesY, n
 
 end function ionc_write_1d_network_nodes_dll
 
-function ionc_put_1d_network_branches_dll(ioncid,networkid, c_sourcenodeid, c_targetnodeid, branchinfo, c_branchlengths, c_nbranchgeometrypoints, nBranches,startIndex) result(ierr) bind(C, name="ionc_put_1d_network_branches")
+function ionc_put_1d_network_branches_dll(ioncid,networkid, c_sourcenodeid, c_targetnodeid, branchinfo, c_branchlengths, c_nbranchgeometrypoints, nBranches,startIndex) result(ierr)
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_put_1d_network_branches_dll
 
   integer(kind=c_int), intent(in)    :: ioncid, networkid, startIndex
@@ -928,7 +928,7 @@ function ionc_get_1d_network_branches_geometry_coordinate_count_dll(ioncid, netw
 
 end function ionc_get_1d_network_branches_geometry_coordinate_count_dll
 
-function ionc_read_1d_network_nodes_dll(ioncid, networkid, c_nodesX, c_nodesY, nodeinfo, nNodes) result(ierr) bind(C, name="ionc_read_1d_network_nodes")
+function ionc_read_1d_network_nodes_dll(ioncid, networkid, c_nodesX, c_nodesY, nodeinfo, nNodes) result(ierr)
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_read_1d_network_nodes_dll
 
   integer(kind=c_int), intent(in)       :: ioncid, networkid, nNodes !< The dataset where i do want to create the dataset.
@@ -951,7 +951,7 @@ function ionc_read_1d_network_nodes_dll(ioncid, networkid, c_nodesX, c_nodesY, n
 
 end function ionc_read_1d_network_nodes_dll
 
-function ionc_get_1d_network_branches_dll(ioncid, networkid, c_sourcenodeid, c_targetnodeid, c_branchlengths, branchinfo, c_nbranchgeometrypoints, nBranches, startIndex)  result(ierr) bind(C, name="ionc_get_1d_network_branches")
+function ionc_get_1d_network_branches_dll(ioncid, networkid, c_sourcenodeid, c_targetnodeid, c_branchlengths, branchinfo, c_nbranchgeometrypoints, nBranches, startIndex)  result(ierr)
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_get_1d_network_branches_dll
 
   integer(kind=c_int), intent(in)       :: ioncid, networkid, startIndex  !< The dataset where i do want to create the dataset.
@@ -1117,7 +1117,7 @@ function ionc_def_mesh_ids_dll(ioncid, meshid, locationType) result(ierr) bind(C
 
 end function ionc_def_mesh_ids_dll
 
-function ionc_put_1d_mesh_discretisation_points_dll(ioncid, meshid, c_branchidx, c_offset, nodesinfo, nmeshpoints, startIndex) result(ierr) bind(C, name="ionc_put_1d_mesh_discretisation_points")
+function ionc_put_1d_mesh_discretisation_points_dll(ioncid, meshid, c_branchidx, c_offset, nodesinfo, nmeshpoints, startIndex) result(ierr)
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_put_1d_mesh_discretisation_points_dll
   integer(kind=c_int), intent(in)     :: ioncid, meshid, nmeshpoints, startIndex
   type(c_ptr), intent(in)             :: c_branchidx,c_offset
@@ -1149,7 +1149,7 @@ function ionc_put_1d_mesh_discretisation_points_dll(ioncid, meshid, c_branchidx,
 
 end function ionc_put_1d_mesh_discretisation_points_dll
 
-function ionc_put_1d_mesh_discretisation_points_v1_dll(ioncid, meshid, c_branchidx, c_offset, nodesinfo, nmeshpoints, startIndex, c_coordx, c_coordy) result(ierr) bind(C, name="ionc_put_1d_mesh_discretisation_points_v1")
+function ionc_put_1d_mesh_discretisation_points_v1_dll(ioncid, meshid, c_branchidx, c_offset, nodesinfo, nmeshpoints, startIndex, c_coordx, c_coordy) result(ierr)
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_put_1d_mesh_discretisation_points_v1_dll
   integer(kind=c_int), intent(in)     :: ioncid, meshid, nmeshpoints, startIndex
   type(c_ptr), intent(in)             :: c_branchidx, c_offset, c_coordx, c_coordy
@@ -1262,7 +1262,8 @@ function ionc_get_1d_mesh_discretisation_points_dll(ioncid, meshid, c_branchidx,
    integer(kind=c_int)             :: ierr
 
    ! Internal Fortran pointers
-   integer,          pointer :: branchidx(:), offset(:)
+   integer,          pointer :: branchidx(:)
+   double precision, pointer :: offset(:)
    type(t_ug_charinfo), pointer :: nodesinfo(:) !< This is our Fortran view of the data
 
    ! Map the C pointers to Fortran arrays/objects
@@ -1271,7 +1272,7 @@ function ionc_get_1d_mesh_discretisation_points_dll(ioncid, meshid, c_branchidx,
    call c_f_pointer(c_nodesinfo_ptr, nodesinfo, [nmeshpoints])
 
    ! Call the internal logic
-   ierr = ionc_get_1d_mesh_discretisation_points(ioncid, meshid, branchidx, offset, nodesinfo, startIndex)
+   ierr = ionc_get_1d_mesh_discretisation_points_ugrid(ioncid, meshid, branchidx, offset, startIndex)
 
 end function ionc_get_1d_mesh_discretisation_points_dll
 
@@ -1285,7 +1286,8 @@ function ionc_get_1d_mesh_discretisation_points_v1_dll(ioncid, meshid, c_branchi
    integer(kind=c_int)             :: ierr
 
    ! Fortran-side pointers
-   integer,          pointer :: branchidx(:), offset(:)
+   integer,          pointer :: branchidx(:)
+   double precision, pointer :: offset(:)
    real(kind=c_double), pointer :: coordx(:), coordy(:)
    type(t_ug_charinfo), pointer :: nodesinfo(:)
 
@@ -1296,7 +1298,7 @@ function ionc_get_1d_mesh_discretisation_points_v1_dll(ioncid, meshid, c_branchi
    call c_f_pointer(c_coordx,    coordx,    [nmeshpoints])
    call c_f_pointer(c_coordy,    coordy,    [nmeshpoints])
 
-   ierr = ionc_get_1d_mesh_discretisation_points_v1(ioncid, meshid, branchidx, offset, nodesinfo, startIndex, coordx, coordy)
+   ierr = ionc_get_1d_mesh_discretisation_points_ugrid_v1(ioncid, meshid, branchidx, offset, startIndex, coordx, coordy)
 end function
 
 function ionc_get_1d_mesh_discretisation_points_v2_dll(ioncid, meshid, c_branchidx, c_offset, c_ids, c_longNames, nmeshpoints, startIndex, c_coordx, c_coordy) result(ierr) bind(C, name="ionc_get_1d_mesh_discretisation_points_v2")
@@ -1398,7 +1400,7 @@ function ionc_get_contacts_count_dll(ioncid, contactid, ncontacts) result(ierr) 
 
 end function ionc_get_contacts_count_dll
 
-function ionc_put_mesh_contact_dll(ioncid, contactsmesh, c_mesh1indexes, c_mesh2indexes, c_contacttype, contactsinfo, ncontacts, startIndex) result(ierr) bind(C, name="ionc_put_mesh_contact")
+function ionc_put_mesh_contact_dll(ioncid, contactsmesh, c_mesh1indexes, c_mesh2indexes, c_contacttype, contactsinfo, ncontacts, startIndex) result(ierr)
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_put_mesh_contact_dll
    integer, intent(in)                   :: ioncid, contactsmesh, ncontacts, startIndex
    type(c_ptr), intent(in)               :: c_mesh1indexes, c_mesh2indexes, c_contacttype
@@ -1449,13 +1451,13 @@ function ionc_write_mesh_1d_edge_nodes_dll(ioncid, meshid, numEdge, c_mesh_1d_ed
    integer,pointer                                             :: mesh_1d_edge_nodes(:,:)
    integer                                                     :: ierr
 
-   call c_f_pointer(c_mesh_1d_edge_nodes, mesh_1d_edge_nodes, (/ numEdge /))
+   call c_f_pointer(c_mesh_1d_edge_nodes, mesh_1d_edge_nodes, [2, numEdge])
 
    ierr = ionc_write_mesh_1d_edge_nodes (ioncid, meshid, numEdge, mesh_1d_edge_nodes, start_index)
 
 end function ionc_write_mesh_1d_edge_nodes_dll
 
-function ionc_get_mesh_contact_dll(ioncid, contactsmesh, c_mesh1indexes, c_mesh2indexes, c_contacttype, contactsinfo, ncontacts, startIndex) result(ierr) bind(C, name="ionc_get_mesh_contact")
+function ionc_get_mesh_contact_dll(ioncid, contactsmesh, c_mesh1indexes, c_mesh2indexes, c_contacttype, contactsinfo, ncontacts, startIndex) result(ierr)
 !DEC$ ATTRIBUTES DLLEXPORT :: ionc_get_mesh_contact_dll
    integer, intent(in)                   :: ioncid, contactsmesh, ncontacts, startIndex
    type(c_ptr), intent(inout)            :: c_mesh1indexes, c_mesh2indexes, c_contacttype

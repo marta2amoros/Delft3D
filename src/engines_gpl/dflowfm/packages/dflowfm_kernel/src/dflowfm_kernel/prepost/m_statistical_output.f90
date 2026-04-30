@@ -256,18 +256,18 @@ contains
 
    !> Check if any structures of the indicated type lie across multiple partitions
    function model_has_structures_across_partitions(location_specifier) result(res)
-      use m_structures, only: model_has_weirs_across_partitions, &
-                              model_has_general_structures_across_partitions, &
-                              model_has_orifices_across_partitions, &
-                              model_has_universal_weirs_across_partitions, &
-                              model_has_culverts_across_partitions, &
-                              model_has_pumps_across_partitions, &
-                              model_has_bridges_across_partitions, &
-                              model_has_long_culverts_across_partitions, &
-                              model_has_dams_across_partitions, &
-                              model_has_dambreaks_across_partitions, &
-                              model_has_gates_across_partitions, &
-                              model_has_compound_structures_across_partitions
+      use m_structures_indices, only: model_has_weirs_across_partitions, &
+                                      model_has_general_structures_across_partitions, &
+                                      model_has_orifices_across_partitions, &
+                                      model_has_universal_weirs_across_partitions, &
+                                      model_has_culverts_across_partitions, &
+                                      model_has_pumps_across_partitions, &
+                                      model_has_bridges_across_partitions, &
+                                      model_has_long_culverts_across_partitions, &
+                                      model_has_dams_across_partitions, &
+                                      model_has_dambreaks_across_partitions, &
+                                      model_has_gates_across_partitions, &
+                                      model_has_compound_structures_across_partitions
       use m_dad, only: model_has_dredge_links_across_partitions
       use m_partitioninfo, only: model_has_crosssections_across_partitions
       use m_laterals, only: model_has_laterals_across_partitions

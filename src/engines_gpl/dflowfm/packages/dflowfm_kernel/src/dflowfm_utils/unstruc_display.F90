@@ -77,7 +77,7 @@ contains
       use M_RAAITEK
       use M_isoscaleunit
       use m_transport, only: iconst_cur
-      use M_FLOW, only: kplot, nplot, kplotfrombedorsurface, kplotordepthaveraged
+      use m_flow_vertical_data, only: kplot, nplot, kplotfrombedorsurface, kplotordepthaveraged
       use m_observations_data, only: jafahrenheit
       use m_sferic
       use m_depmax
@@ -328,7 +328,7 @@ contains
       use m_sferzoom
       use M_isoscaleunit
       use m_transport, only: iconst_cur
-      use m_flow
+      use m_flow_vertical_data, only: kplot, nplot, kplotfrombedorsurface, kplotordepthaveraged
       use m_observations_data
       use m_sferic
       use m_depmax
@@ -562,7 +562,8 @@ contains
 
       use m_observations_data
       use M_FLOWGEOM
-      use m_flow
+      use m_flow_link_data, only: s1, ucx, ucy
+      use m_flow_vertical_data, only: kmx
       use m_transport, only: itemp, constituents
       use m_get_kbot_ktop
       use m_pfiller
@@ -854,8 +855,9 @@ contains
    subroutine plotFixedWeirs()
       use m_fixedweirs
       use m_flowgeom, only: lnx, lncn, bob
-      use m_flow, only: hu, isimplefixedweirs
-      use m_netw, only: xk, yk
+      use m_flow_link_data, only: hu
+      use m_flowparameters, only: isimplefixedweirs
+      use network_data, only: xk, yk
       use m_htext
 
       integer :: i, L, k3, k4, ncol
@@ -1165,7 +1167,7 @@ contains
       use m_flowgeom, only: xu, yu, lnx
       use gridoperations
       use m_flowparameters, only: epshu
-      use m_flow, only: hu
+      use m_flow_link_data, only: hu
       use m_wearelt, only: rcir
       use m_gtext
       use m_inview
@@ -1314,7 +1316,8 @@ contains
    subroutine dis_info_1d_link(LL)
       use m_flowgeom
       use network_data
-      use m_flow
+      use m_missing, only: dmiss
+      use m_flow_link_data, only: au, cfuhi, hs, hu, q1, s1, u1, vol1, vol1_f
       use unstruc_channel_flow
       use m_1d_structures
       use m_Pump
@@ -1576,9 +1579,15 @@ contains
    end subroutine zoomshift
 
    subroutine tekwindvector()
-      use m_flow
+      use m_flow_link_data, only: a1ini, qinrain, qouteva, vingrwcum, vinbndcum, vinlatcum, vinraincum, &
+                                  vol1, vol1ini, vol1tot, volgrw, volgrwini, voutbndcum, voutgrwcum, &
+                                  voutlatcum, voutevacum
       use m_transport, only: numconst, constituents
       use m_flowgeom, only: ndxi
+      use m_flow_vertical_data, only: kbot, ktop
+      use m_flowparameters, only: eps4, jasal, jatem, upot0, ukin0
+      use m_grw, only: jagrw
+      use m_heatfluxes, only: Qsunav, Qevaav, QCONav, QLongav, Qfreeav
       use m_xbeach_data, only: csx, snx, itheta_view
       use m_flowparameters, only: jawave
       use m_statistics, only: npdf, xpdf, ypdf
@@ -1869,4 +1878,3 @@ contains
    end subroutine tekwindvector
 
 end module unstruc_display
-

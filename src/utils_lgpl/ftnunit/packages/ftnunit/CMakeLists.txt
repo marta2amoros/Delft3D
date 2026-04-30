@@ -15,4 +15,3 @@ endif()
 # Create the folder structure in vfproj
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${source})
 set_target_properties (${library_name} PROPERTIES FOLDER utils_lgpl/ftnunit)
-
