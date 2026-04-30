@@ -1685,13 +1685,14 @@ contains
       integer :: ierr
 
       if (.not. allocated(wx)) then
-         allocate (wx(lnx), wy(lnx), wdsu(lnx), wdsu_x(lnx), wdsu_y(lnx), stat=ierr)
-         call aerr('wx(lnx), wy(lnx), wdsu(lnx), wdsu_x(lnx), wdsu_y(lnx)', ierr, lnx)
+         allocate (wx(lnx), wy(lnx), wdsu(lnx), wdsu_x(lnx), wdsu_y(lnx), wcharnock(lnx), stat=ierr)
+         call aerr('wx(lnx), wy(lnx), wdsu(lnx), wdsu_x(lnx), wdsu_y(lnx), wcharnock(lnx)', ierr, lnx)
          wx = 0.0_dp
          wy = 0.0_dp
          wdsu = 0.0_dp
          wdsu_x = 0.0_dp
          wdsu_y = 0.0_dp
+         wcharnock = 0.0_dp
       end if
 
    end subroutine allocatewindarrays

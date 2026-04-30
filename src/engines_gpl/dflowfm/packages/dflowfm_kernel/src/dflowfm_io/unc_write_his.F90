@@ -1476,16 +1476,22 @@ contains
       if (allocated(weir2cgen)) then
          indices = [integer :: (weir2cgen(i), i=1, nweirgen)]
          structure_names = [(trimexact(cgen_ids(indices(i)), strlen_netcdf), i=1, nweirgen)]
-      else if (network%sts%numWeirs > 0) then
+      else if (network%sts%numWeirs > 0 .and. associated(network%sts%weirIndices) .and. associated(network%sts%struct)) then
          indices = [integer :: (network%sts%weirIndices(i), i=1, nweirgen)]
          structure_names = [(trimexact(network%sts%struct(indices(i))%id, strlen_netcdf), i=1, nweirgen)]
       else
+         if (allocated(structure_names)) deallocate (structure_names)
          allocate (structure_names(0))
       end if
       call unc_put_his_structure_names(ncid, jahisweir, id_weirgen_id, structure_names)
 
-      indices = [integer :: (network%sts%orificeIndices(i), i=1, network%sts%numOrifices)]
-      structure_names = [(trimexact(network%sts%struct(indices(i))%id, strlen_netcdf), i=1, network%sts%numOrifices)]
+      if (network%sts%numOrifices > 0 .and. associated(network%sts%orificeIndices) .and. associated(network%sts%struct)) then
+         indices = [integer :: (network%sts%orificeIndices(i), i=1, network%sts%numOrifices)]
+         structure_names = [(trimexact(network%sts%struct(indices(i))%id, strlen_netcdf), i=1, network%sts%numOrifices)]
+      else
+         if (allocated(structure_names)) deallocate (structure_names)
+         allocate (structure_names(0))
+      end if
       call unc_put_his_structure_names(ncid, jahisorif, id_orifgen_id, structure_names)
 
       structure_names = [(pump_ids(i), i=1, npumpsg)]
@@ -1497,7 +1503,7 @@ contains
 
       if (jaoldstr == 1) then
          structure_names = [(cgen_ids(i), i=1, ncgensg)]
-      else if (network%sts%numGeneralStructures > 0) then
+      else if (network%sts%numGeneralStructures > 0 .and. associated(network%sts%generalStructureIndices) .and. associated(network%sts%struct)) then
          indices = [integer :: (network%sts%generalStructureIndices(i), i=1, ngenstru)]
          structure_names = [(trimexact(network%sts%struct(indices(i))%id, strlen_netcdf), i=1, ngenstru)]
       else
@@ -1506,19 +1512,34 @@ contains
       end if
       call unc_put_his_structure_names(ncid, jahiscgen, id_genstru_id, structure_names)
 
-      indices = [integer :: (network%sts%uniweirIndices(i), i=1, network%sts%numuniweirs)]
-      structure_names = [(trimexact(network%sts%struct(indices(i))%id, strlen_netcdf), i=1, network%sts%numuniweirs)]
+      if (network%sts%numuniweirs > 0 .and. associated(network%sts%uniweirIndices) .and. associated(network%sts%struct)) then
+         indices = [integer :: (network%sts%uniweirIndices(i), i=1, network%sts%numuniweirs)]
+         structure_names = [(trimexact(network%sts%struct(indices(i))%id, strlen_netcdf), i=1, network%sts%numuniweirs)]
+      else
+         if (allocated(structure_names)) deallocate (structure_names)
+         allocate (structure_names(0))
+      end if
       call unc_put_his_structure_names(ncid, jahisuniweir, id_uniweir_id, structure_names)
 
       structure_names = get_dambreak_names()
       call unc_put_his_structure_names(ncid, jahisdambreak, id_dambreak_id, structure_names)
 
-      indices = [integer :: (network%sts%culvertIndices(i), i=1, network%sts%numCulverts)]
-      structure_names = [(trimexact(network%sts%struct(indices(i))%id, strlen_netcdf), i=1, network%sts%numCulverts)]
+      if (network%sts%numCulverts > 0 .and. associated(network%sts%culvertIndices) .and. associated(network%sts%struct)) then
+         indices = [integer :: (network%sts%culvertIndices(i), i=1, network%sts%numCulverts)]
+         structure_names = [(trimexact(network%sts%struct(indices(i))%id, strlen_netcdf), i=1, network%sts%numCulverts)]
+      else
+         if (allocated(structure_names)) deallocate (structure_names)
+         allocate (structure_names(0))
+      end if
       call unc_put_his_structure_names(ncid, jahisculv, id_culvert_id, structure_names)
 
-      indices = [integer :: (network%sts%bridgeIndices(i), i=1, network%sts%numBridges)]
-      structure_names = [(trimexact(network%sts%struct(indices(i))%id, strlen_netcdf), i=1, network%sts%numBridges)]
+      if (network%sts%numBridges > 0 .and. associated(network%sts%bridgeIndices) .and. associated(network%sts%struct)) then
+         indices = [integer :: (network%sts%bridgeIndices(i), i=1, network%sts%numBridges)]
+         structure_names = [(trimexact(network%sts%struct(indices(i))%id, strlen_netcdf), i=1, network%sts%numBridges)]
+      else
+         if (allocated(structure_names)) deallocate (structure_names)
+         allocate (structure_names(0))
+      end if
       call unc_put_his_structure_names(ncid, jahisbridge, id_bridge_id, structure_names)
 
       structure_names = [(network%cmps%compound(i)%id, i=1, network%cmps%count)]
@@ -1542,7 +1563,7 @@ contains
       structure_names = [(srcname(i), i=1, numsrc)]
       call unc_put_his_structure_names(ncid, jahissourcesink, id_srcname, structure_names)
 
-      if (network%sts%numGates > 0) then
+      if (network%sts%numGates > 0 .and. associated(network%sts%gateIndices) .and. associated(network%sts%struct)) then
          indices = [integer :: (network%sts%gateIndices(i), i=1, ngategen)]
          structure_names = [(trimexact(network%sts%struct(network%sts%gateIndices(i))%id, strlen_netcdf), i=1, ngategen)]
       else

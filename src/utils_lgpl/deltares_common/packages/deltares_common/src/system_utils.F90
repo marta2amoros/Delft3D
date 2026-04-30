@@ -36,15 +36,7 @@ module system_utils
    implicit none
    private
 
-#if (defined(__linux__))
-   character(5), parameter, public :: ARCH = 'linux'
-   character(3), parameter, public :: SCRIPT_EXTENSION = '.sh'
-   character(3), parameter, public :: SHARED_LIB_PREFIX = 'lib'
-   character(3), parameter, public :: SHARED_LIB_EXTENSION = '.so'
-   character(1), parameter, public :: FILESEP = '/'
-
-   character(1), parameter, public :: FILESEP_OTHER_ARCH = '\'
-#else
+#if (defined(WIN32) || defined(_WIN32))
    character(7), parameter, public :: ARCH = 'windows'
    character(4), parameter, public :: SCRIPT_EXTENSION = '.bat'
    character(0), parameter, public :: SHARED_LIB_PREFIX = ''
@@ -52,6 +44,14 @@ module system_utils
    character(1), parameter, public :: FILESEP = '\'
 
    character(1), parameter, public :: FILESEP_OTHER_ARCH = '/'
+#else
+   character(5), parameter, public :: ARCH = 'linux'
+   character(3), parameter, public :: SCRIPT_EXTENSION = '.sh'
+   character(3), parameter, public :: SHARED_LIB_PREFIX = 'lib'
+   character(3), parameter, public :: SHARED_LIB_EXTENSION = '.so'
+   character(1), parameter, public :: FILESEP = '/'
+
+   character(1), parameter, public :: FILESEP_OTHER_ARCH = '\'
 #endif
 
    public :: cat_filename
@@ -104,7 +104,7 @@ contains
 
       ierr = 0
       exe_full_path = ''
-#if (defined(__linux__))
+#if (!defined(WIN32) && !defined(_WIN32))
       path_length = readlink('/proc/self/exe'//c_null_char, c_buffer, size(c_buffer, kind=c_size_t))
       if (path_length == -1) then
          ierr = -1

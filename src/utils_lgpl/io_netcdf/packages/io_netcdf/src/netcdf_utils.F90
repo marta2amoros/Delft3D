@@ -89,7 +89,7 @@ type nc_att_set
    integer                                   :: size = 0      !< Actual size of attribute set
    integer                                   :: growsby = 1   !< Increment for attribute set
    integer                                   :: count = 0     !< Actual number of attributes in set
-   type(ug_nc_attribute), pointer, dimension(:) :: atts          !< Buffered array with the nc_attribute elements
+   type(ug_nc_attribute), pointer, dimension(:) :: atts => null() !< Buffered array with the nc_attribute elements
 end type nc_att_set
 
 interface ncu_set_att
@@ -756,18 +756,32 @@ function ncu_put_var_attset(ncid, varid, attset) result(ierr)
       select case(attset(i)%xtype)
       case(NF90_CHAR)
          tmpstr = ' '
-         nlen = min(len(tmpstr), attset(i)%len)
-         do j=1,nlen
-            tmpstr(j:j) = attset(i)%strvalue(j)
-         end do
-
-         ierr = nf90_put_att(ncid, varid, attset(i)%attname, tmpstr)
+         if (allocated(attset(i)%strvalue)) then
+            nlen = min(len(tmpstr), attset(i)%len, size(attset(i)%strvalue))
+            do j=1,nlen
+               tmpstr(j:j) = attset(i)%strvalue(j)
+            end do
+            if (nlen > 0) then
+               ierr = nf90_put_att(ncid, varid, attset(i)%attname, tmpstr(1:nlen))
+            else
+               ierr = nf90_put_att(ncid, varid, attset(i)%attname, '')
+            end if
+         end if
       case(NF90_INT)
-         ierr = nf90_put_att(ncid, varid, attset(i)%attname, attset(i)%intvalue(1:attset(i)%len))
+         if (allocated(attset(i)%intvalue)) then
+            nlen = min(attset(i)%len, size(attset(i)%intvalue))
+            if (nlen > 0) ierr = nf90_put_att(ncid, varid, attset(i)%attname, attset(i)%intvalue(1:nlen))
+         end if
       case(NF90_FLOAT)
-         ierr = nf90_put_att(ncid, varid, attset(i)%attname, attset(i)%fltvalue(1:attset(i)%len))
+         if (allocated(attset(i)%fltvalue)) then
+            nlen = min(attset(i)%len, size(attset(i)%fltvalue))
+            if (nlen > 0) ierr = nf90_put_att(ncid, varid, attset(i)%attname, attset(i)%fltvalue(1:nlen))
+         end if
       case(NF90_DOUBLE)
-         ierr = nf90_put_att(ncid, varid, attset(i)%attname, attset(i)%dblvalue(1:attset(i)%len))
+         if (allocated(attset(i)%dblvalue)) then
+            nlen = min(attset(i)%len, size(attset(i)%dblvalue))
+            if (nlen > 0) ierr = nf90_put_att(ncid, varid, attset(i)%attname, attset(i)%dblvalue(1:nlen))
+         end if
       case default
          ! NF90_BYTE
          ! NF90_SHORT

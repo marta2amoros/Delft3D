@@ -515,6 +515,8 @@ contains
       integer :: kt !< index of top layer
       real(fp) :: ag_fp !< gravitational acceleration (m/s2)
 
+      if (ja_icecover == ICECOVER_NONE .or. is_allocated_icecover(ice_data) == 0) return
+
       ag_fp = real(ag, fp)
 
       allocate (water_level_fp(ndx), water_density(ndx))

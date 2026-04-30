@@ -165,16 +165,16 @@ module m_1d_structures
       type(t_hashlist)                                      :: hashlist_bridge
       type(t_hashlist)                                      :: hashlist_pump
       type(t_hashlist)                                      :: hashlist_structure
-      integer                                               :: currentFileVersion       !< Lowest file version used in the input 
-      integer                                               :: numWeirs                 !< Total number of weirs in this structure set. See indices array below.
-      integer                                               :: numCulverts              !< Total number of culverts in this structure set. See indices array below.
-      integer                                               :: numPumps                 !< Total number of pumps in this structure set. See indices array below.
-      integer                                               :: numBridges               !< Total number of bridges in this structure set. See indices array below.
-      integer                                               :: numOrifices              !< Total number of orifices in this structure set. See indices array below.
-      integer                                               :: numGates                 !< Total number of gates in this structure set. See indices array below.
-      integer                                               :: numGeneralStructures     !< Total number of general structures in this structure set. See indices array below.
-      integer                                               :: numUniWeirs              !< Total number of universal weirs in this structure set. See indices array below.
-      integer                                               :: numDambreaks             !< Total number of dambreaks in this structure set. See indices array below.
+      integer                                               :: currentFileVersion = 0   !< Lowest file version used in the input
+      integer                                               :: numWeirs = 0             !< Total number of weirs in this structure set. See indices array below.
+      integer                                               :: numCulverts = 0          !< Total number of culverts in this structure set. See indices array below.
+      integer                                               :: numPumps = 0             !< Total number of pumps in this structure set. See indices array below.
+      integer                                               :: numBridges = 0           !< Total number of bridges in this structure set. See indices array below.
+      integer                                               :: numOrifices = 0          !< Total number of orifices in this structure set. See indices array below.
+      integer                                               :: numGates = 0             !< Total number of gates in this structure set. See indices array below.
+      integer                                               :: numGeneralStructures = 0 !< Total number of general structures in this structure set. See indices array below.
+      integer                                               :: numUniWeirs = 0          !< Total number of universal weirs in this structure set. See indices array below.
+      integer                                               :: numDambreaks = 0         !< Total number of dambreaks in this structure set. See indices array below.
       integer, pointer, dimension(:)                        :: weirIndices             => null() !< (numWeirs) indices of the weirs in the overall struct(:) array. Note: some may actually be of type ST_GENERAL_ST.
       integer, pointer, dimension(:)                        :: culvertIndices          => null() !< (numCulverts) indices of the culverts in the overall struct(:) array.
       integer, pointer, dimension(:)                        :: pumpIndices             => null() !< (numPumps) indices of the pumps in the overall struct(:) array.

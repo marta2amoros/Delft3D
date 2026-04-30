@@ -63,7 +63,7 @@ contains
       integer :: ierr !< Result status (DFM_NOERR if successful)
       integer :: n, k, kk, nv
 
-      real(kind=dp), pointer :: lonn(:), latn(:)
+      real(kind=dp), pointer :: lonn(:) => null(), latn(:) => null()
       integer :: make_latlon
 
       ierr = DFM_NOERR
@@ -160,10 +160,18 @@ contains
       end if
 
 888   continue
+      if (jsferic /= 1) then
+         if (associated(lonn)) deallocate(lonn)
+         if (associated(latn)) deallocate(latn)
+      end if
       ! Successful exit
       return
 
 999   continue
+      if (jsferic /= 1) then
+         if (associated(lonn)) deallocate(lonn)
+         if (associated(latn)) deallocate(latn)
+      end if
       ! Some error occurred
       return
 

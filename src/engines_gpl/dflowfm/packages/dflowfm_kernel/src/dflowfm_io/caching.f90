@@ -659,6 +659,9 @@ contains
       !
       ! Store data for thin dams
       !
+      if (.not. allocated(cached_thin_dams)) then
+         allocate (cached_thin_dams(0))
+      end if
       write (lun) section(key_thin_dams), size(cached_thin_dams, 1)
       call store_thin_dams(lun, cached_thin_dams)
 
@@ -679,15 +682,33 @@ contains
       number_thin_dams = size(thin_dams, 1)
       if (number_thin_dams > 0) then
          do i = 1, number_thin_dams
-            number_flow_links = size(thin_dams(i)%ln)
-            number_polyline_points = size(thin_dams(i)%xp)
+            number_flow_links = 0
+            if (thin_dams(i)%lnx > 0) then
+               if (allocated(thin_dams(i)%ln) .and. allocated(thin_dams(i)%indexp) .and. &
+                   allocated(thin_dams(i)%wfp) .and. allocated(thin_dams(i)%xk) .and. &
+                   allocated(thin_dams(i)%yk) .and. allocated(thin_dams(i)%iperm) .and. &
+                   allocated(thin_dams(i)%sp) .and. allocated(thin_dams(i)%wfk1k2)) then
+                  number_flow_links = min(thin_dams(i)%lnx, size(thin_dams(i)%ln), &
+                                          size(thin_dams(i)%indexp), size(thin_dams(i)%wfp), &
+                                          size(thin_dams(i)%xk, 2), size(thin_dams(i)%yk, 2), &
+                                          size(thin_dams(i)%iperm), size(thin_dams(i)%sp), &
+                                          size(thin_dams(i)%wfk1k2))
+               end if
+            end if
+            number_polyline_points = 0
+            if (thin_dams(i)%np > 0) then
+               if (allocated(thin_dams(i)%xp) .and. allocated(thin_dams(i)%yp) .and. allocated(thin_dams(i)%zp)) then
+                  number_polyline_points = min(thin_dams(i)%np, size(thin_dams(i)%xp), &
+                                               size(thin_dams(i)%yp), size(thin_dams(i)%zp))
+               end if
+            end if
             write (lun) number_flow_links, number_polyline_points
-            write (lun) thin_dams(i)%np, thin_dams(i)%lnx
+            write (lun) number_polyline_points, number_flow_links
             if (number_polyline_points > 0) then
                write (lun) thin_dams(i)%xp(1:number_polyline_points), thin_dams(i)%yp(1:number_polyline_points), &
                   thin_dams(i)%zp(1:number_polyline_points)
             end if
-            if (thin_dams(i)%lnx > 0) then
+            if (number_flow_links > 0) then
                write (lun) thin_dams(i)%ln(1:number_flow_links), thin_dams(i)%indexp(1:number_flow_links), &
                   thin_dams(i)%wfp(1:number_flow_links), thin_dams(i)%xk(1:2, 1:number_flow_links), &
                   thin_dams(i)%yk(1:2, 1:number_flow_links), thin_dams(i)%iperm(1:number_flow_links), &

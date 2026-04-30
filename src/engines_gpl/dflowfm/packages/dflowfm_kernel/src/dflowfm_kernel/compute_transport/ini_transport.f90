@@ -58,6 +58,7 @@ contains
       use m_alloc
       use unstruc_model, only: md_thetav_waq
       use m_bedform, only: bfmpar
+      use m_flowgeom, only: Ndx, Lnx
 
       implicit none
 
@@ -253,9 +254,14 @@ contains
       iconst_cur = min(NUMCONST, 1)
 
 !  local timestepping
+      call realloc(ndeltasteps, Ndx, keepExisting=.false., fill=1)
+      call realloc(jaupdate, Ndx, keepExisting=.false., fill=1)
+      call realloc(jaupdatehorflux, Lnx, keepExisting=.false., fill=1)
+      call realloc(jaupdateconst, NUMCONST, keepExisting=.false., fill=1)
       time_dtmax = -1.0_dp ! cfl-numbers not evaluated
       nsubsteps = 1
       ndeltasteps = 1
+      jaupdate = 1
       jaupdatehorflux = 1
       numnonglobal = 0
 

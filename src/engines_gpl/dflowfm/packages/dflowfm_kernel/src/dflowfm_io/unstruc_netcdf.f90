@@ -18138,8 +18138,10 @@ contains
       type(ug_nc_attribute), optional, intent(in) :: extra_attributes(:) !< (optional) Set containing additional custom NetCDF attributes for this variable.
 
       integer :: ierr, int_fill
+      integer :: iatt, jatt, attlen
       real(dp) :: dp_fill
       logical :: add_gridmapping_
+      character(len=:), allocatable :: attvalue
 
       ierr = nf90_noerr
 
@@ -18190,9 +18192,46 @@ contains
       end select
 
       if (present(extra_attributes)) then
-         if (size(extra_attributes) > 0) then
-            call check_netcdf_error(ncu_put_var_attset(ncid, idq, extra_attributes))
-         end if
+         do iatt = 1, size(extra_attributes)
+            select case (extra_attributes(iatt)%xtype)
+            case (nf90_char)
+               if (allocated(extra_attributes(iatt)%strvalue)) then
+                  attlen = min(extra_attributes(iatt)%len, size(extra_attributes(iatt)%strvalue))
+                  if (attlen > 0) then
+                     attvalue = repeat(' ', attlen)
+                     do jatt = 1, attlen
+                        attvalue(jatt:jatt) = extra_attributes(iatt)%strvalue(jatt)
+                     end do
+                  else
+                     attvalue = ''
+                  end if
+                  call check_netcdf_error(nf90_put_att(ncid, idq, trim(extra_attributes(iatt)%attname), attvalue))
+               end if
+            case (nf90_int)
+               if (allocated(extra_attributes(iatt)%intvalue)) then
+                  attlen = min(extra_attributes(iatt)%len, size(extra_attributes(iatt)%intvalue))
+                  if (attlen > 0) then
+                     call check_netcdf_error(nf90_put_att(ncid, idq, trim(extra_attributes(iatt)%attname), extra_attributes(iatt)%intvalue(1:attlen)))
+                  end if
+               end if
+            case (nf90_float)
+               if (allocated(extra_attributes(iatt)%fltvalue)) then
+                  attlen = min(extra_attributes(iatt)%len, size(extra_attributes(iatt)%fltvalue))
+                  if (attlen > 0) then
+                     call check_netcdf_error(nf90_put_att(ncid, idq, trim(extra_attributes(iatt)%attname), extra_attributes(iatt)%fltvalue(1:attlen)))
+                  end if
+               end if
+            case (nf90_double)
+               if (allocated(extra_attributes(iatt)%dblvalue)) then
+                  attlen = min(extra_attributes(iatt)%len, size(extra_attributes(iatt)%dblvalue))
+                  if (attlen > 0) then
+                     call check_netcdf_error(nf90_put_att(ncid, idq, trim(extra_attributes(iatt)%attname), extra_attributes(iatt)%dblvalue(1:attlen)))
+                  end if
+               end if
+            case default
+               call mess(LEVEL_ERROR, 'unstruc_netcdf/definencvar: invalid netcdf type for extra attribute!')
+            end select
+         end do
       end if
 
    end subroutine definencvar

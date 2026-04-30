@@ -1,0 +1,14 @@
+* 1.2.184.Unknown
+* Source: Unknown
+* File creation date: 12:11:13, 30-04-2026
+** INFO   : Command: /home/mamorositrepat/progs/src/Delft3D/build_dflowfm/install/bin/dflowfm f34_linux.mdu
+ Until here copy of previous diagnostic file
+** INFO   : Reading cache file: f34_linux.cache
+** INFO   : No cache file available initially. Proceeding with normal initialization.
+** INFO   : Opened file : f34_obs.xyn
+** INFO   : Closed file : f34_obs.xyn
+** INFO   : Opened file : f34_thd.pli
+** INFO   : Closed file : f34_thd.pli
+** INFO   : Opened file : f34_crs.pli
+** INFO   : Closed file : f34_crs.pli
+** ERROR  : Cannot create output directory ".\".

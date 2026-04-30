@@ -148,8 +148,8 @@ contains
       nf_numsour = 0
       nf_numsink = 0
       numsrc_nf = 0
-      nf_entr_start = 0
-      nf_entr_end = 0
+      if (allocated(nf_entr_start)) nf_entr_start = 0
+      if (allocated(nf_entr_end)) nf_entr_end = 0
       !
       ! Pointers to data inside COSUMO_BMI
       !
@@ -180,8 +180,8 @@ contains
       if (allocated(nf_intake_n)) deallocate (nf_intake_n, stat=istat)
       if (allocated(nf_intake_nk)) deallocate (nf_intake_nk, stat=istat)
       if (allocated(nf_numintake_idif)) deallocate (nf_numintake_idif, stat=istat)
-      if (allocated(nf_sinkid)) deallocate (nf_entr_start, stat=istat)
-      if (allocated(nf_sinkid)) deallocate (nf_entr_end, stat=istat)
+      if (allocated(nf_entr_start)) deallocate (nf_entr_start, stat=istat)
+      if (allocated(nf_entr_end)) deallocate (nf_entr_end, stat=istat)
       if (allocated(nf_sinkid)) deallocate (nf_sinkid, stat=istat)
       if (allocated(nf_sour_wght)) deallocate (nf_sour_wght, stat=istat)
       if (allocated(nf_sour_wght_sum)) deallocate (nf_sour_wght_sum, stat=istat)
