@@ -224,7 +224,10 @@ endfunction(configure_package_installer)
 # targetDir         : Name of the directory to search for binaries whose rpath needs to be set
 # rpathValue        : Value to which rpath needs to be set
 function(set_rpath targetDir rpathValue)
-  execute_process(COMMAND find "${targetDir}" -type f -exec bash -c "patchelf --set-rpath '${rpathValue}' $1" _ {} \; -exec echo "patched rpath of: " {} \;)
+  execute_process(
+    COMMAND find "${targetDir}" -type f
+            -exec bash "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/set_rpath_if_elf.sh" "${rpathValue}" {} \;
+  )
 endfunction(set_rpath)
 
 
